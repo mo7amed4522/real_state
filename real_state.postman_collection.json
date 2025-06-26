@@ -1,0 +1,1127 @@
+{
+	"info": {
+		"_postman_id": "e5a3b4d2-1234-5678-9abc-def012345678",
+		"name": "Real Estate Microservices",
+		"description": "API collection for the Real Estate microservices project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "room_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "message_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "notification_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "companyId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "propertyId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "dotnet_base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"+1234567890\",\n    \"role\": \"buyer\",\n    \"company\": \"Example Corp\",\n    \"licenseNumber\": \"LIC123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new user with the system"
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login and get JWT token"
+					}
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"<emailVerificationToken>\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/verify-email",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "verify-email"]
+						},
+						"description": "Verify a user's email address using the token returned from registration."
+					}
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgot-password",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "forgot-password"]
+						},
+						"description": "Request a password reset token for the given email."
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"<resetToken>\",\n    \"newPassword\": \"NewPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "reset-password"]
+						},
+						"description": "Reset the user's password using the token from the forgot password request."
+					}
+				}
+			]
+		},
+		{
+			"name": "Profile Management",
+			"item": [
+				{
+					"name": "Upload Profile Photo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/upload-photo",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "upload-photo"]
+						},
+						"description": "Upload user profile photo (max 5MB, jpg/jpeg/png only)"
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"+1234567890\",\n    \"company\": \"New Company\",\n    \"licenseNumber\": \"NEW123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile"]
+						},
+						"description": "Update user profile information"
+					}
+				},
+				{
+					"name": "Get Own Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile"]
+						},
+						"description": "Get current user's profile"
+					}
+				}
+			]
+		},
+		{
+			"name": "Companies",
+			"item": [
+				{
+					"name": "Create Company",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"companyId\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Real Estate Inc.\",\n    \"website\": \"https://realestate.com\",\n    \"phone\": \"123-456-7890\",\n    \"address\": \"123 Main St, Anytown\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/companies",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"companies"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Companies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/companies",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"companies"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Company by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/companies/{{companyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"companies",
+								"{{companyId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Company",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Real Estate Inc.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/companies/{{companyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"companies",
+								"{{companyId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Company",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/companies/{{companyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"companies",
+								"{{companyId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Upload Company Logo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/companies/{{companyId}}/logo",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"companies",
+								"{{companyId}}",
+								"logo"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Properties",
+			"item": [
+				{
+					"name": "Create Property",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"propertyId\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Luxury Villa with Ocean View\",\n    \"description\": \"A beautiful villa with a stunning view of the ocean.\",\n    \"price\": 1250000,\n    \"propertyType\": \"villa\",\n    \"companyId\": \"{{companyId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"properties"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Properties",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"properties"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Property by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/properties/{{propertyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"properties",
+								"{{propertyId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Property",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 1300000,\n    \"status\": \"under-offer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/properties/{{propertyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"properties",
+								"{{propertyId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Property",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/properties/{{propertyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"properties",
+								"{{propertyId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Upload Property Images",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "metadata",
+									"value": "[{\"caption\":\"Main entrance\"}, {\"caption\":\"Living room\", \"isPrimary\": true}]",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/properties/{{propertyId}}/images",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"properties",
+								"{{propertyId}}",
+								"images"
+							]
+						},
+						"description": "Upload multiple images for a property. The `metadata` field is a JSON string array where each object corresponds to a file in the `files` array."
+					}
+				},
+				{
+					"name": "Upload Property Videos",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "videos",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "metadata",
+									"value": "[{\"caption\":\"Property tour\"}, {\"caption\":\"Drone footage\", \"isPrimary\": true}]",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/properties/{{propertyId}}/videos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"properties",
+								"{{propertyId}}",
+								"videos"
+							]
+						},
+						"description": "Upload multiple videos for a property. The `metadata` field is a JSON string array where each object corresponds to a file in the `videos` array."
+					}
+				}
+			]
+		},
+		{
+			"name": "Payments (.NET)",
+			"item": [
+				{
+					"name": "Create Stripe Checkout Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{userId}}\",\n  \"propertyId\": \"{{propertyId}}\",\n  \"amount\": 1000.00,\n  \"currency\": \"USD\",\n  \"transactionId\": \"unique-client-tx-id\"\n}"
+						},
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments/create-checkout-session",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments", "create-checkout-session"]
+						},
+						"description": "Initiate a Stripe payment session for a property. Returns a Stripe session ID."
+					}
+				},
+				{
+					"name": "(Future) Payment Webhook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments/webhook",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments", "webhook"]
+						},
+						"description": "Stripe webhook endpoint (to be implemented)."
+					}
+				},
+				{
+					"name": "(Future) Get Payment Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments/{{paymentId}}/status",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments", "{{paymentId}}", "status"]
+						},
+						"description": "Get the status of a payment by ID (to be implemented)."
+					}
+				},
+				{
+					"name": "(Future) Refund Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"paymentId\": \"{{paymentId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments/refund",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments", "refund"]
+						},
+						"description": "Refund a payment (to be implemented)."
+					}
+				},
+				{
+					"name": "(Future) Download Invoice",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/invoices/{{invoiceId}}/download",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "invoices", "{{invoiceId}}", "download"]
+						},
+						"description": "Download a signed invoice PDF (to be implemented)."
+					}
+				},
+				{
+					"name": "Get Payment by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments/{{paymentId}}",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments", "{{paymentId}}"]
+						},
+						"description": "Get details for a specific payment."
+					}
+				},
+				{
+					"name": "List Payments (with filters & pagination)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments?userId={{userId}}&propertyId={{propertyId}}&status=success&method=stripe&page=1&pageSize=10",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments"],
+							"query": [
+								{ "key": "userId", "value": "{{userId}}" },
+								{ "key": "propertyId", "value": "{{propertyId}}" },
+								{ "key": "status", "value": "success" },
+								{ "key": "method", "value": "stripe" },
+								{ "key": "page", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						},
+						"description": "List payments with advanced filters and pagination."
+					}
+				},
+				{
+					"name": "Create Manual Payment (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{userId}}\",\n  \"propertyId\": \"{{propertyId}}\",\n  \"amount\": 1000.00,\n  \"currency\": \"USD\",\n  \"method\": \"manual\",\n  \"status\": \"success\"\n}"
+						},
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments/manual",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments", "manual"]
+						},
+						"description": "Create a manual payment (admin only)."
+					}
+				},
+				{
+					"name": "Update Payment Status (admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"refunded\"\n}"
+						},
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/payments/{{paymentId}}/status",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "payments", "{{paymentId}}", "status"]
+						},
+						"description": "Update the status of a payment (admin only)."
+					}
+				}
+			]
+		},
+		{
+			"name": "Invoices (.NET)",
+			"item": [
+				{
+					"name": "Get Invoice by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/invoices/{{invoiceId}}",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "invoices", "{{invoiceId}}"]
+						},
+						"description": "Get details for a specific invoice."
+					}
+				},
+				{
+					"name": "List Invoices (with filters & pagination)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/invoices?paymentId={{paymentId}}&status=generated&page=1&pageSize=10",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "invoices"],
+							"query": [
+								{ "key": "paymentId", "value": "{{paymentId}}" },
+								{ "key": "status", "value": "generated" },
+								{ "key": "page", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						},
+						"description": "List invoices with advanced filters and pagination."
+					}
+				}
+			]
+		},
+		{
+			"name": "Transactions (.NET)",
+			"item": [
+				{
+					"name": "List Transaction Logs (with filters & pagination)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dotnet_base_url}}/api/v1/transactions?externalRef=abc123&operationType=create_payment&page=1&pageSize=10",
+							"host": ["{{dotnet_base_url}}"],
+							"path": ["api", "v1", "transactions"],
+							"query": [
+								{ "key": "externalRef", "value": "abc123" },
+								{ "key": "operationType", "value": "create_payment" },
+								{ "key": "page", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						},
+						"description": "List transaction logs with advanced filters and pagination."
+					}
+				}
+			]
+		},
+		{
+			"name": "Chat",
+			"item": [
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"chat_room\": \"{{room_id}}\",\n  \"content\": \"Hello, this is a message!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/chat/send",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "send"]
+						}
+					}
+				},
+				{
+					"name": "Get All Chat Rooms",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/chat/rooms",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms"]
+						}
+					}
+				},
+				{
+					"name": "Get Messages in Room",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/chat/room/{{room_id}}/messages",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "room", "{{room_id}}", "messages"]
+						}
+					}
+				},
+				{
+					"name": "Get Unread Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/chat/notifications/unread",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "notifications", "unread"]
+						}
+					}
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/chat/notifications/mark-read/{{notification_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "notifications", "mark-read", "{{notification_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Join Chat Room (WebSocket)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Use a WebSocket client to connect to ws://localhost:8000/ws/chat/{{room_id}}/",
+									"// Send JSON: {\"sender_id\":\"<user_uuid>\", \"content\":\"Hello!\"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabled": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "ws://localhost:8000/ws/chat/{{room_id}}/",
+							"host": ["ws://localhost:8000"],
+							"path": ["ws", "chat", "{{room_id}}", ""]
+						},
+						"description": "Use a WebSocket client to connect to this URL."
+					}
+				},
+				{
+					"name": "Create Chat Room",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"buyer\": \"<buyer_user_id>\",\n  \"seller\": \"<seller_user_id>\",\n  \"property\": \"<property_id>\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/chat/rooms/",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Chat Room",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/chat/rooms/{{room_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms", "{{room_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Mute Chat Room",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"room_id\": \"{{room_id}}\",\n  \"mute\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/chat/rooms/{{room_id}}/mute/",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms", "{{room_id}}", "mute", ""]
+						}
+					}
+				},
+				{
+					"name": "Remove User from Chat Room",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"room_id\": \"{{room_id}}\",\n  \"user_id\": \"<user_id_to_remove>\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/chat/rooms/{{room_id}}/remove/",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms", "{{room_id}}", "remove", ""]
+						}
+					}
+				},
+				{
+					"name": "Mark Single Message as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/chat/message/{{message_id}}/mark-read/",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "message", "{{message_id}}", "mark-read", ""]
+						}
+					}
+				},
+				{
+					"name": "Flag Message for Moderation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/chat/message/{{message_id}}/moderate/",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "message", "{{message_id}}", "moderate", ""]
+						}
+					}
+				},
+				{
+					"name": "WebSocket: Mark Message as Read (Real-Time)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Connect to ws://localhost:8000/ws/chat/{{room_id}}/",
+									"// Send: {\"type\": \"read\", \"message_id\": \"{{message_id}}\"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabled": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "ws://localhost:8000/ws/chat/{{room_id}}/",
+							"host": ["ws://localhost:8000"],
+							"path": ["ws", "chat", "{{room_id}}", ""]
+						},
+						"description": "WebSocket: Send {\"type\": \"read\", \"message_id\": \"{{message_id}}\"} to mark as read."
+					}
+				},
+				{
+					"name": "WebSocket: Send Message (Real-Time)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Connect to ws://localhost:8000/ws/chat/{{room_id}}/",
+									"// Send: {\"sender_id\": \"<user_id>\", \"content\": \"Hello in real-time!\"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabled": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "ws://localhost:8000/ws/chat/{{room_id}}/",
+							"host": ["ws://localhost:8000"],
+							"path": ["ws", "chat", "{{room_id}}", ""]
+						},
+						"description": "WebSocket: Send {\"sender_id\": \"<user_id>\", \"content\": \"Hello in real-time!\"} to send a message."
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"if (pm.response.code === 200 && pm.response.json().access_token) {",
+					"    pm.environment.set(\"auth_token\", pm.response.json().access_token);",
+					"}"
+				]
+			}
+		}
+	]
+} 

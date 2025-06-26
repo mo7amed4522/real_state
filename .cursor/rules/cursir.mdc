@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+{
+  "rules": [
+    {
+      "name": "Use Django for Python-based microservices",
+      "description": "When generating Python code, use Django framework with REST Framework for building microservices.",
+      "condition": {
+        "language": "python"
+      },
+      "prompt": "You are building a microservice in Django. Use best practices such as serializers, views, routers, and separate apps per service. Ensure RESTful design."
+    },
+    {
+      "name": "Use .NET Core for C# microservices",
+      "description": "When generating C# code, use ASP.NET Core for building microservices.",
+      "condition": {
+        "language": "csharp"
+      },
+      "prompt": "You are building a microservice in ASP.NET Core. Use controllers, services, dependency injection, and follow RESTful API design principles."
+    },
+    {
+      "name": "Ensure cross-service communication guidelines",
+      "description": "When generating APIs, make sure they're ready for inter-service communication.",
+      "prompt": "All endpoints should return consistent JSON responses. Include proper status codes, error handling, and versioning (e.g., /api/v1/resource)."
+    },
+    {
+      "name": "Add authentication and logging by default",
+      "description": "Every service must include basic auth and logging scaffolding.",
+      "prompt": "Include JWT authentication and structured logging using Django logging or Serilog in .NET. Do not skip security basics."
+    },
+    {
+      "name": "Containerization readiness",
+      "description": "Generate Dockerfiles and docker-compose setup for each service.",
+      "prompt": "Each service should have a Dockerfile and a docker-compose.yml snippet for local development."
+    }
+  ]
+}
