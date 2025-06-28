@@ -1,0 +1,23 @@
+// ignore_for_file: unused_import
+
+import 'package:go_router/go_router.dart';
+import 'package:real_state_app/presentation/views/register_view.dart';
+import '../../presentation/views/home_view.dart';
+import '../../presentation/views/login_view.dart';
+import '../../presentation/views/forgot_password_view.dart';
+
+final GoRouter appRouter = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => const LoginScreen()),
+    GoRoute(path: '/home', builder: (context, state) => const HomeView()),
+    GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/register-screen',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+  ],
+);

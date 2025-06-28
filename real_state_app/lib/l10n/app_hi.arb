@@ -1,0 +1,11 @@
+{
+  "appTitle": "रियल एस्टेट ऐप",
+  "home": "होम",
+  "login": "लॉगिन",
+  "welcome": "रियल एस्टेट ऐप में आपका स्वागत है!",
+  "forgotPassword": "पासवर्ड भूल गए",
+  "email": "ईमेल",
+  "sendCode": "कोड भेजें",
+  "emailRequired": "ईमेल आवश्यक है",
+  "enterValidEmail": "मान्य ईमेल दर्ज करें"
+} 

@@ -1,0 +1,11 @@
+{
+  "appTitle": "Real Estate App",
+  "home": "Bahay",
+  "login": "Mag-login",
+  "welcome": "Maligayang pagdating sa Real Estate App!",
+  "forgotPassword": "Nakalimutan ang Password",
+  "email": "Email",
+  "sendCode": "Ipadala ang Code",
+  "emailRequired": "Kinakailangan ang email",
+  "enterValidEmail": "Maglagay ng wastong email"
+} 

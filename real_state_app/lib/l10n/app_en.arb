@@ -1,0 +1,22 @@
+{
+  "appTitle": "Real Estate App",
+  "@appTitle": {
+    "description": "The title of My Applications"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "The title of the app"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "The title of the app"
+  },
+ "register": "Register",
+  "@register": {
+    "description": "The title of the app"
+  },
+  "welcome": "Welcome to the Real Estate App!",
+  "@welcome": {
+    "description": "The title of the app"
+  }
+}

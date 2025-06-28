@@ -1,0 +1,93 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+{
+  "name": "Flutter-MVVM-BLoC-Rules",
+  "version": "1.0.0",
+  "description": "Strict rules for Flutter projects using MVVM, flutter_bloc, equatable, go_router, json_serializable, .env, and multi-language support.",
+  "rules": {
+    "project_structure": {
+      "enabled": true,
+      "structure": {
+        "required_folders": [
+          "lib/core",
+          "lib/features",
+          "lib/generated",
+          "lib/main.dart"
+        ],
+        "feature_structure": {
+          "required_per_feature": [
+            "presentation",
+            "domain",
+            "data"
+          ],
+          "presentation_required": [
+            "pages",
+            "widgets",
+            "viewmodels"
+          ],
+          "data_required": [
+            "models",
+            "datasources",
+            "mappers"
+          ],
+          "domain_required": [
+            "entities",
+            "usecases",
+            "repositories"
+          ]
+        }
+      }
+    },
+    "architecture": {
+      "pattern": "MVVM",
+      "enforced_layers": ["View", "ViewModel", "Model"],
+      "state_management": "flutter_bloc",
+      "serialization": "json_serializable",
+      "routing": "go_router",
+      "localization": "flutter_gen_l10n",
+      "env_config": "dotenv",
+      "animations": "ConsumerStatefulWidget"
+    },
+    "bloc_conventions": {
+      "event_naming": "*Event",
+      "state_naming": "*State",
+      "viewmodel_naming": "*ViewModel",
+      "must_extend_equatable": true
+    },
+    "model_conventions": {
+      "must_use_json_serializable": true,
+      "must_be_immutable": true,
+      "must_extend_equatable": true
+    },
+    "file_conventions": {
+      "env_file_exists": true,
+      "env_example_exists": true,
+      "l10n_yaml_exists": true,
+      "routes_defined_in_core": true
+    },
+    "naming_rules": {
+      "feature_folder": "lowercase_with_underscores",
+      "classes": "PascalCase",
+      "variables": "camelCase",
+      "files": "snake_case"
+    },
+    "linting": {
+      "recommended_lints": "flutter_lints",
+      "formatter_enabled": true
+    },
+    "testing": {
+      "unit_test_location": "test/unit",
+      "widget_test_location": "test/widget",
+      "integration_test_location": "test/integration"
+    }
+  },
+  "messages": {
+    "project_structure_warning": "Your folder structure does not match the required Flutter MVVM architecture.",
+    "missing_bloc_files": "Make sure every feature has a Bloc, Event, and State class.",
+    "model_not_serializable": "All models must be annotated with @JsonSerializable().",
+    "env_missing": ".env file is missing. Please add it."
+  }
+}
