@@ -1,0 +1,16 @@
+{
+  "REGISTER": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiMmU5MDJiNC05NDNkLTRjNjMtYWNlMy1jZTYyNGE5YWVkMWUiLCJlbWFpbCI6Impqbm5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYnV5ZXIiLCJpYXQiOjE3NTExODI2NDksImV4cCI6MTc1MTc4NzQ0OX0.JiDaiBxwao1B25Dhv25UitEsx7FaxtZIi7glJkypqdY",
+    "user": {
+      "id": "b2e902b4-943d-4c63-ace3-ce624a9aed1e",
+      "email": "jjnn@example.com",
+      "role": "buyer",
+      "status": "pending_verification",
+      "avatarUrl": null
+    }
+  },
+  "VERIFY_CODE": {
+    "message": "Email verified successfully",
+    "email": "yahyya@example.com"
+  }
+}

@@ -11,12 +11,34 @@
   "@login": {
     "description": "The title of the app"
   },
- "register": "Register",
+  "email": "E-Mail",
+  "@email": {},
+  "enteryouremail": "Enter Your E-Mail",
+  "@enteryouremail": {},
+  "emailrequied": "Email is required",
+  "@emailrequied": {},
+  "register": "Register",
   "@register": {
     "description": "The title of the app"
   },
   "welcome": "Welcome to the Real Estate App!",
   "@welcome": {
+    "description": "The title of the app"
+  },
+  "verifyCode": "Verify Code",
+  "@verifyCode": {
+    "description": "The title of the app"
+  },
+  "enterverifycode": "Enter Your Verify Code",
+  "@enterverifycode": {
+    "description": "The title of the app"
+  },
+  "verifycoderequired": "Verify Code Required",
+  "@verifycoderequired": {
+    "description": "The title of the app"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
     "description": "The title of the app"
   }
 }

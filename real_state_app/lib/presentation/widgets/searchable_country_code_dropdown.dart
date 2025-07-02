@@ -1,4 +1,7 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
@@ -64,65 +67,134 @@ class _SearchableCountryCodeDropdownState
   }
 
   void _showCountryPicker() async {
-    final selected = await showDialog<CountryCode>(
-      context: context,
-      builder: (context) {
-        String search = '';
-        List<CountryCode> filtered = _countryCodes;
-        return StatefulBuilder(
-          builder: (context, setState) {
-            filtered = _countryCodes
-                .where(
-                  (c) =>
-                      c.name.toLowerCase().contains(search.toLowerCase()) ||
-                      c.dialCode.contains(search) ||
-                      c.code.toLowerCase().contains(search.toLowerCase()),
-                )
-                .toList();
-            return AlertDialog(
-              title: const Text('Select Country Code'),
-              content: SizedBox(
-                width: 350,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+    final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    if (isIOS) {
+      final selected = await showCupertinoModalPopup<CountryCode>(
+        context: context,
+        builder: (context) {
+          String search = '';
+          List<CountryCode> filtered = _countryCodes;
+          return StatefulBuilder(
+            builder: (context, setState) {
+              filtered = _countryCodes
+                  .where(
+                    (c) =>
+                        c.name.toLowerCase().contains(search.toLowerCase()) ||
+                        c.dialCode.contains(search) ||
+                        c.code.toLowerCase().contains(search.toLowerCase()),
+                  )
+                  .toList();
+              return CupertinoActionSheet(
+                title: const Text('Select Country Code'),
+                message: Column(
                   children: [
-                    TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Search country',
-                        prefixIcon: Icon(Icons.search),
-                      ),
+                    CupertinoSearchTextField(
+                      placeholder: 'Search country',
                       onChanged: (value) => setState(() => search = value),
                     ),
                     const SizedBox(height: 8),
-                    Expanded(
+                    SizedBox(
+                      height: 300,
                       child: ListView.builder(
-                        shrinkWrap: true,
                         itemCount: filtered.length,
                         itemBuilder: (context, i) {
                           final country = filtered[i];
-                          return ListTile(
-                            leading: Text(country.flag),
-                            title: Text(
-                              '${country.name} (${country.dialCode})',
+                          return CupertinoActionSheetAction(
+                            onPressed: () => Navigator.of(context).pop(country),
+                            child: Row(
+                              children: [
+                                Text(country.flag),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${country.name} (${country.dialCode})',
+                                  style: const TextStyle(
+                                    fontFamily: '.SF Pro Text',
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
                             ),
-                            onTap: () => Navigator.of(context).pop(country),
                           );
                         },
                       ),
                     ),
                   ],
                 ),
-              ),
-            );
-          },
-        );
-      },
-    );
-    if (selected != null) widget.onChanged(selected);
+                cancelButton: CupertinoActionSheetAction(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+              );
+            },
+          );
+        },
+      );
+      if (selected != null) widget.onChanged(selected);
+    } else {
+      final selected = await showDialog<CountryCode>(
+        context: context,
+        builder: (context) {
+          String search = '';
+          List<CountryCode> filtered = _countryCodes;
+          return StatefulBuilder(
+            builder: (context, setState) {
+              filtered = _countryCodes
+                  .where(
+                    (c) =>
+                        c.name.toLowerCase().contains(search.toLowerCase()) ||
+                        c.dialCode.contains(search) ||
+                        c.code.toLowerCase().contains(search.toLowerCase()),
+                  )
+                  .toList();
+              return AlertDialog(
+                title: const Text('Select Country Code'),
+                content: SizedBox(
+                  width: 350,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Search country',
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                        onChanged: (value) => setState(() => search = value),
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: filtered.length,
+                          itemBuilder: (context, i) {
+                            final country = filtered[i];
+                            return ListTile(
+                              leading: Text(country.flag),
+                              title: Text(
+                                '${country.name} (${country.dialCode})',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              onTap: () => Navigator.of(context).pop(country),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      );
+      if (selected != null) widget.onChanged(selected);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    final isDark = theme.brightness == Brightness.dark;
     if (_loading) {
       return const CircularProgressIndicator();
     }
@@ -137,20 +209,39 @@ class _SearchableCountryCodeDropdownState
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade400),
+          border: Border.all(
+            color: isDark
+                ? theme.colorScheme.outline
+                : theme.colorScheme.primary.withOpacity(0.3),
+          ),
           borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
+          color: isDark ? theme.colorScheme.surface : Colors.white,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(selected.flag),
-            const SizedBox(width: 8),
+            Text(selected.flag, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 4),
             Text(
               selected.dialCode,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isDark
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onBackground,
+                fontFamily: isIOS ? '.SF Pro Text' : null,
+                fontSize: 11,
+              ),
             ),
-            const Icon(Icons.arrow_drop_down),
+            isIOS
+                ? const Icon(CupertinoIcons.chevron_down, size: 17)
+                : Icon(
+                    Icons.arrow_drop_down,
+                    size: 7,
+                    color: isDark
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.primary,
+                  ),
           ],
         ),
       ),

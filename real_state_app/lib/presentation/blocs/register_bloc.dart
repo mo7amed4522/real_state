@@ -1,14 +1,12 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:real_state_app/data/models/register_request.dart';
-import 'package:real_state_app/data/models/register_response.dart';
-import 'package:real_state_app/data/datasources/local_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:real_state_app/domain/entities/register_entity.dart';
+import 'package:real_state_app/domain/usecases/register_usecase.dart';
+
+import 'package:real_state_app/presentation/widgets/loader.dart';
 
 // Events
 abstract class RegisterEvent extends Equatable {
@@ -67,7 +65,12 @@ class RegisterCountryCodeChanged extends RegisterEvent {
   List<Object?> get props => [countryCode, dialCode];
 }
 
-class RegisterSubmitted extends RegisterEvent {}
+class RegisterSubmitted extends RegisterEvent {
+  final BuildContext context;
+  const RegisterSubmitted(this.context);
+  @override
+  List<Object?> get props => [context];
+}
 
 class ToggleRegisterPasswordVisibility extends RegisterEvent {}
 
@@ -165,8 +168,10 @@ class RegisterState extends Equatable {
 }
 
 // Bloc
+
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
-  RegisterBloc() : super(const RegisterState()) {
+  final RegisterUseCase registerUseCase;
+  RegisterBloc({required this.registerUseCase}) : super(const RegisterState()) {
     on<RegisterFirstNameChanged>(_onFirstNameChanged);
     on<RegisterLastNameChanged>(_onLastNameChanged);
     on<RegisterPhoneChanged>(_onPhoneChanged);
@@ -189,7 +194,8 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     RegisterEmailChanged event,
     Emitter<RegisterState> emit,
   ) {
-    final isEmailValid = _validateEmail(event.email);
+    final email = event.email;
+    final isEmailValid = _validateEmail(email) == null;
     emit(
       state.copyWith(
         email: event.email,
@@ -288,16 +294,17 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     if (state.firstName.isEmpty ||
         state.lastName.isEmpty ||
         state.phone.isEmpty ||
-        !state.isEmailValid ||
-        !state.isPasswordValid ||
-        !state.isConfirmPasswordValid) {
+        state.email.isEmpty ||
+        !state.isPasswordValid) {
       return;
     }
     emit(
       state.copyWith(isSubmitting: true, isFailure: false, isSuccess: false),
     );
+    // Show loader
+    Loader().lottieLoader(event.context);
     try {
-      final request = RegisterRequest(
+      final entity = RegisterEntity(
         email: state.email,
         password: state.password,
         firstName: state.firstName,
@@ -307,21 +314,26 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         company: 'FREE',
         licenseNumber: 'LIC123456',
       );
-      final response = await http.post(
-        Uri.parse(dotenv.env['HTTP_REGISTRATION_URL']!),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(request.toJson()),
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final registerResponse = RegisterResponse.fromJson(data);
-        await LocalStorage.saveToken(registerResponse.accessToken);
-        await LocalStorage.saveUser(registerResponse.user.toJson());
+      final result = await registerUseCase(entity);
+      Future.microtask(() {
+        if (event.context.mounted &&
+            Navigator.of(event.context, rootNavigator: true).canPop()) {
+          Navigator.of(event.context, rootNavigator: true).pop();
+        }
+      });
+      debugPrint(result.isSuccess.toString());
+      if (result.isSuccess) {
         emit(state.copyWith(isSubmitting: false, isSuccess: true));
       } else {
         emit(state.copyWith(isSubmitting: false, isFailure: true));
       }
     } catch (e) {
+      Future.microtask(() {
+        if (event.context.mounted &&
+            Navigator.of(event.context, rootNavigator: true).canPop()) {
+          Navigator.of(event.context, rootNavigator: true).pop();
+        }
+      });
       emit(state.copyWith(isSubmitting: false, isFailure: true));
     }
   }
@@ -333,9 +345,14 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     emit(state.copyWith(showPassword: !state.showPassword));
   }
 
-  bool _validateEmail(String email) {
-    final emailRegex = RegExp(r'^.+@.+\..+ 24');
-    return emailRegex.hasMatch(email);
+  String? _validateEmail(String? email) {
+    if (email == null || email.isEmpty) {
+      return 'Email is required';
+    }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+      return 'Enter a valid email';
+    }
+    return null;
   }
 
   bool _validatePassword(String password) {

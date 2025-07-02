@@ -122,16 +122,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome to the Real Estate App!'**
   String get welcome;
-
+  // login screen additions
   String get forgotPassword;
   String get email;
   String get sendCode;
   String get emailRequired;
   String get enterValidEmail;
+  String get enterPassword;
+  String get passwordRequired;
   // Register screen additions
   String get register;
+  String get doNotHaveAccount;
+  String get firstName;
+  String get enterFirstName;
+  String get firstNameRequired;
+  String get lastName;
+  String get enterLastName;
+  String get lastNameRequired;
   String get password;
+  String get passwordShort;
   String get confirmPassword;
+  String get phone;
+  String get enterPhone;
+  String get phoneRequired;
+  String get sucessRegister;
+  String get faildRegister;
+  // Verify code screen additions
+  String get verifyCode;
+  String get enterVerifyCode;
+  String get verifyCodeRequired;
+  String get confirm;
 }
 
 class _AppLocalizationsDelegate
@@ -174,84 +194,291 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
 // Add stubs for new localization classes
 class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
+
   @override
   String get appTitle => 'تطبيق العقارات';
+
   @override
   String get home => 'الرئيسية';
+
   @override
   String get login => 'تسجيل الدخول';
+
   @override
   String get welcome => 'مرحبًا بك في تطبيق العقارات!';
+
   @override
   String get forgotPassword => 'نسيت كلمة المرور';
+
   @override
   String get email => 'البريد الإلكتروني';
+
   @override
   String get sendCode => 'إرسال الرمز';
+
   @override
   String get emailRequired => 'البريد الإلكتروني مطلوب';
+
   @override
   String get enterValidEmail => 'أدخل بريدًا إلكترونيًا صحيحًا';
+
+  @override
+  String get enterPassword => 'أدخل كلمة المرور';
+
+  @override
+  String get passwordRequired => 'كلمة المرور مطلوبة';
+
   @override
   String get register => 'تسجيل';
+
+  @override
+  String get doNotHaveAccount => 'ليس لديك حساب؟';
+
+  @override
+  String get firstName => 'الاسم الأول';
+
+  @override
+  String get enterFirstName => 'أدخل الاسم الأول';
+
+  @override
+  String get firstNameRequired => 'الاسم الأول مطلوب';
+
+  @override
+  String get lastName => 'اسم العائلة';
+
+  @override
+  String get enterLastName => 'أدخل اسم العائلة';
+
+  @override
+  String get lastNameRequired => 'اسم العائلة مطلوب';
+
   @override
   String get password => 'كلمة المرور';
+
+  @override
+  String get passwordShort => 'كلمة المرور قصيرة جدًا';
+
   @override
   String get confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get phone => 'رقم الهاتف';
+
+  @override
+  String get enterPhone => 'أدخل رقم الهاتف';
+
+  @override
+  String get phoneRequired => 'رقم الهاتف مطلوب';
+
+  @override
+  String get sucessRegister => 'تم التسجيل بنجاح';
+
+  @override
+  String get faildRegister => 'فشل التسجيل';
+
+  @override
+  String get enterVerifyCode => 'أدخل رمز التحقق';
+
+  @override
+  String get verifyCode => 'رمز التحقق';
+
+  @override
+  String get verifyCodeRequired => 'رمز التحقق مطلوب';
+
+  @override
+  String get confirm => 'تأكيد';
 }
 
 class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
+
   @override
   String get appTitle => 'रियल एस्टेट ऐप';
+
   @override
   String get home => 'होम';
+
   @override
   String get login => 'लॉगिन';
+
   @override
   String get welcome => 'रियल एस्टेट ऐप में आपका स्वागत है!';
+
   @override
   String get forgotPassword => 'पासवर्ड भूल गए';
+
   @override
   String get email => 'ईमेल';
+
   @override
   String get sendCode => 'कोड भेजें';
+
   @override
   String get emailRequired => 'ईमेल आवश्यक है';
+
   @override
   String get enterValidEmail => 'मान्य ईमेल दर्ज करें';
+
+  @override
+  String get enterPassword => 'पासवर्ड दर्ज करें';
+
+  @override
+  String get passwordRequired => 'पासवर्ड आवश्यक है';
+
   @override
   String get register => 'रजिस्टर करें';
+
+  @override
+  String get doNotHaveAccount => 'क्या आपके पास खाता नहीं है?';
+
+  @override
+  String get firstName => 'पहला नाम';
+
+  @override
+  String get enterFirstName => 'पहला नाम दर्ज करें';
+
+  @override
+  String get firstNameRequired => 'पहला नाम आवश्यक है';
+
+  @override
+  String get lastName => 'अंतिम नाम';
+
+  @override
+  String get enterLastName => 'अंतिम नाम दर्ज करें';
+
+  @override
+  String get lastNameRequired => 'अंतिम नाम आवश्यक है';
+
   @override
   String get password => 'पासवर्ड';
+
+  @override
+  String get passwordShort => 'पासवर्ड बहुत छोटा है';
+
   @override
   String get confirmPassword => 'पासवर्ड की पुष्टि करें';
+
+  @override
+  String get phone => 'फ़ोन';
+
+  @override
+  String get enterPhone => 'फ़ोन नंबर दर्ज करें';
+
+  @override
+  String get phoneRequired => 'फ़ोन नंबर आवश्यक है';
+
+  @override
+  String get sucessRegister => 'सफलतापूर्वक पंजीकृत';
+
+  @override
+  String get faildRegister => 'पंजीकरण विफल';
+
+  @override
+  String get enterVerifyCode => 'अपने सत्यापन कोड दर्ज करें';
+
+  @override
+  String get verifyCode => 'सत्यापन कोड';
+
+  @override
+  String get verifyCodeRequired => 'सत्यापन कोड आवश्यक है';
+
+  @override
+  String get confirm => 'पुष्टि करें';
 }
 
 class AppLocalizationsFil extends AppLocalizations {
   AppLocalizationsFil([String locale = 'fil']) : super(locale);
+
   @override
   String get appTitle => 'Real Estate App';
+
   @override
   String get home => 'Bahay';
+
   @override
   String get login => 'Mag-login';
+
   @override
   String get welcome => 'Maligayang pagdating sa Real Estate App!';
+
   @override
   String get forgotPassword => 'Nakalimutan ang Password';
+
   @override
   String get email => 'Email';
+
   @override
   String get sendCode => 'Ipadala ang Code';
+
   @override
   String get emailRequired => 'Kinakailangan ang email';
+
   @override
   String get enterValidEmail => 'Maglagay ng wastong email';
+
+  @override
+  String get enterPassword => 'Ilagay ang Password';
+
+  @override
+  String get passwordRequired => 'Kinakailangan ang password';
+
   @override
   String get register => 'Magrehistro';
+
+  @override
+  String get doNotHaveAccount => 'Wala ka pang account?';
+
+  @override
+  String get firstName => 'Pangalan';
+
+  @override
+  String get enterFirstName => 'Ilagay ang pangalan';
+
+  @override
+  String get firstNameRequired => 'Kinakailangan ang pangalan';
+
+  @override
+  String get lastName => 'Apelyido';
+
+  @override
+  String get enterLastName => 'Ilagay ang apelyido';
+
+  @override
+  String get lastNameRequired => 'Kinakailangan ang apelyido';
+
   @override
   String get password => 'Password';
+
+  @override
+  String get passwordShort => 'Masyadong maikli ang password';
+
   @override
   String get confirmPassword => 'Kumpirmahin ang Password';
+
+  @override
+  String get phone => 'Telepono';
+
+  @override
+  String get enterPhone => 'Ilagay ang numero ng telepono';
+
+  @override
+  String get phoneRequired => 'Kinakailangan ang numero ng telepono';
+
+  @override
+  String get sucessRegister => 'Matagumpay na nakarehistro';
+
+  @override
+  String get faildRegister => 'Nabigong magrehistro';
+
+  @override
+  String get enterVerifyCode => 'Ipasok ang Iyong Verify Code';
+
+  @override
+  String get verifyCode => 'Suriin ang Code';
+
+  @override
+  String get verifyCodeRequired => 'Kinakailangan ang Suriin ang Code';
+
+  @override
+  String get confirm => 'Kumpirmahin';
 }

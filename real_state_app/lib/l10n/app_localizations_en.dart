@@ -1,5 +1,6 @@
 // ignore: unused_import
-import 'package:intl/intl.dart' as intl;
+// ignore_for_file: override_on_non_overriding_member
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -41,4 +42,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String get password => 'Password';
   @override
   String get confirmPassword => 'Confirm Password';
+  @override
+  String get verifyCode => 'Verify Code';
+
+  @override
+  String get enterVerifyCode => 'Enter Your Verify Code';
+
+  @override
+  String get verifyCodeRequired => 'Verify Code Required';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get doNotHaveAccount => "Don't have an account?";
+
+  @override
+  String get enterFirstName => 'Enter your first name';
+
+  @override
+  String get enterLastName => 'Enter your last name';
+
+  @override
+  String get enterPassword => 'Enter your password';
+
+  @override
+  String get firstName => 'First Name';
+
+  @override
+  String get lastName => 'Last Name';
+
+  @override
+  String get passwordRequired => 'Password required';
+
+  @override
+  String get haveAccount => 'Already have an account ?';
+
+  @override
+  String get invalidCredentials => 'Invalid credentials';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get enterPhone => 'Enter your phone number';
+
+  @override
+  String get faildRegister => 'Failed to register';
+
+  @override
+  String get firstNameRequired => 'First name required';
+
+  @override
+  String get lastNameRequired => 'Last name required';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get phoneRequired => 'Phone required';
+
+  @override
+  String get resendCode => 'Resend Code';
+
+  @override
+  String get passwordShort => 'Password is too short';
+
+  @override
+  String get sucessRegister => 'Registered successfully';
 }

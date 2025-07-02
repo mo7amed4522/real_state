@@ -65,18 +65,41 @@ class _AnimatedTextFormFieldState extends ConsumerState<AnimatedTextFormField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isPassword = widget.isPasswordField ?? false;
     return TextFormField(
       controller: widget.controller,
       focusNode: _focusNode,
-      obscureText: isPassword ? !(widget.passwordVisible ?? false) : widget.obscureText,
-      style: theme.textTheme.bodyLarge,
+      obscureText: isPassword
+          ? !(widget.passwordVisible ?? false)
+          : widget.obscureText,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: isDark
+            ? theme.colorScheme.onSurface
+            : theme.colorScheme.onBackground,
+      ),
       keyboardType: widget.keyboardType,
       enabled: widget.enabled,
       decoration: InputDecoration(
-        prefixIcon: Icon(widget.icon, color: Colors.grey),
+        prefixIcon: Icon(
+          widget.icon,
+          color: isDark ? theme.colorScheme.outline : theme.colorScheme.primary,
+        ),
         labelText: widget.labelText,
+        labelStyle: TextStyle(
+          color: _focusNode.hasFocus || widget.controller.text.isNotEmpty
+              ? theme.colorScheme.primary
+              : (isDark
+                    ? theme.colorScheme.onSurface.withOpacity(0.7)
+                    : theme.colorScheme.onBackground.withOpacity(0.7)),
+        ),
+        floatingLabelStyle: TextStyle(color: theme.colorScheme.primary),
         hintText: widget.hintText,
+        hintStyle: TextStyle(
+          color: isDark
+              ? theme.colorScheme.onSurface.withOpacity(0.5)
+              : theme.colorScheme.onBackground.withOpacity(0.5),
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
@@ -88,14 +111,17 @@ class _AnimatedTextFormFieldState extends ConsumerState<AnimatedTextFormField> {
                   (widget.passwordVisible ?? false)
                       ? Icons.visibility
                       : Icons.visibility_off,
-                  color: Colors.grey,
+                  color: isDark
+                      ? theme.colorScheme.outline
+                      : theme.colorScheme.primary,
                 ),
                 onPressed: widget.onTogglePasswordVisibility,
               )
             : widget.suffix,
         errorText: _errorText,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: isDark ? theme.colorScheme.surface : Colors.white,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
       ),
       validator: (value) {
         final error = widget.validator?.call(value);

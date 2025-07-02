@@ -7,13 +7,18 @@ class RegisterResponse {
   @JsonKey(name: 'access_token')
   final String accessToken;
   final User user;
+  final String emailVerificationToken;
+  final String testEmail;
 
   RegisterResponse({
     required this.accessToken,
     required this.user,
+    required this.emailVerificationToken,
+    required this.testEmail,
   });
 
-  factory RegisterResponse.fromJson(Map<String, dynamic> json) => _$RegisterResponseFromJson(json);
+  factory RegisterResponse.fromJson(Map<String, dynamic> json) =>
+      _$RegisterResponseFromJson(json);
   Map<String, dynamic> toJson() => _$RegisterResponseToJson(this);
 }
 

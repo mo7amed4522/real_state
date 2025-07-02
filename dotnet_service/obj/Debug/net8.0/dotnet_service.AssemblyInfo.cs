@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("dotnet_service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eae84f3d955bb140c1adf42dc1588c4ac7e267a5")]
 [assembly: System.Reflection.AssemblyProductAttribute("dotnet_service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("dotnet_service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

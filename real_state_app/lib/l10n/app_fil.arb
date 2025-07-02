@@ -1,11 +1,30 @@
 {
   "appTitle": "Real Estate App",
+  "@appTitle": {},
   "home": "Bahay",
+  "@home": {},
   "login": "Mag-login",
+  "@login": {},
   "welcome": "Maligayang pagdating sa Real Estate App!",
+  "@welcome": {},
   "forgotPassword": "Nakalimutan ang Password",
+  "@forgotPassword": {},
   "email": "Email",
+  "@email": {},
   "sendCode": "Ipadala ang Code",
+  "@sendCode": {},
   "emailRequired": "Kinakailangan ang email",
-  "enterValidEmail": "Maglagay ng wastong email"
-} 
+  "@emailRequired": {},
+  "enterValidEmail": "Maglagay ng wastong email",
+  "@enterValidEmail": {},
+  "verifyCode": "Code ng Pag-verify",
+  "@verifyCode": {},
+  "enterVerifyCode": "Ilagay ang Iyong Code ng Pag-verify",
+  "@enterVerifyCode": {},
+  "verifyCodeRequired": "Kinakailangan ang Code ng Pag-verify",
+  "@verifyCodeRequired": {},
+  "register": "Magrehistro",
+  "@register": {},
+  "confirm": "Kumpirmahin",
+  "@confirm": {}
+}

@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException, NotFoundException
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, DeepPartial, Like, ILike, MoreThan } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -11,6 +11,9 @@ import { DeveloperProfile } from './entities/developer-profile.entity';
 import { BrokerProfile } from './entities/broker-profile.entity';
 import { RegisterUserDto, UpdateUserDto, ChangePasswordDto, ResetPasswordDto, SearchUsersDto } from './dto/user.dto';
 import { generateEncryptedFileName, ensureUserUploadDir, getPublicFileUrl } from './utils/file-upload.utils';
+import { hashString } from './utils/hash.utils';
+import { extname, join } from 'path';
+import { promises as fsPromises } from 'fs';
 
 interface FileUpload {
   buffer: Buffer;
@@ -79,29 +82,26 @@ export class AuthService {
     };
   }
 
-  async uploadUserPhoto(userId: string, file: FileUpload) {
-    const user = await this.findUserById(userId);
+  async uploadUserPhoto(userId: string, file: Express.Multer.File) {
+    const folderName = hashString(userId);
+    const ext = extname(file.originalname);
+    const fileName = hashString(file.originalname + Date.now()) + ext;
+    const uploadDir = join(process.cwd(), 'uploads', 'users', folderName);
+    await fsPromises.mkdir(uploadDir, { recursive: true });
+    const filePath = join(uploadDir, fileName);
+    await fsPromises.writeFile(filePath, file.buffer);
     
-    const uploadDir = ensureUserUploadDir(userId);
-    const encryptedFileName = generateEncryptedFileName(file.originalname, userId);
-    const filePath = path.join(uploadDir, encryptedFileName);
+    // Generate URL using the controller endpoint
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const photoUrl = `${baseUrl}/auth/user-photo/${folderName}/${fileName}`;
     
-    // Delete old photo if exists
-    if (user.avatarFileName) {
-      const oldFilePath = path.join(uploadDir, user.avatarFileName);
-      if (fs.existsSync(oldFilePath)) {
-        fs.unlinkSync(oldFilePath);
-      }
-    }
-
-    // Save new photo
-    fs.writeFileSync(filePath, file.buffer);
-
-    // Update user record
-    user.avatarFileName = encryptedFileName;
-    user.avatarUrl = getPublicFileUrl(userId, encryptedFileName);
+    // Save URL to user in database
+    await this.userRepository.update(userId, { 
+      avatarUrl: photoUrl,
+      avatarFileName: fileName 
+    });
     
-    return this.userRepository.save(user);
+    return { url: photoUrl };
   }
 
   async updateUser(userId: string, updateDto: UpdateUserDto) {

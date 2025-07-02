@@ -1,11 +1,30 @@
 {
   "appTitle": "تطبيق العقارات",
+  "@appTitle": {},
   "home": "الرئيسية",
+  "@home": {},
   "login": "تسجيل الدخول",
+  "@login": {},
   "welcome": "مرحبًا بك في تطبيق العقارات!",
+  "@welcome": {},
   "forgotPassword": "نسيت كلمة المرور",
+  "@forgotPassword": {},
   "email": "البريد الإلكتروني",
+  "@email": {},
   "sendCode": "إرسال الرمز",
+  "@sendCode": {},
   "emailRequired": "البريد الإلكتروني مطلوب",
-  "enterValidEmail": "أدخل بريدًا إلكترونيًا صحيحًا"
-} 
+  "@emailRequired": {},
+  "enterValidEmail": "أدخل بريدًا إلكترونيًا صحيحًا",
+  "@enterValidEmail": {},
+  "verifyCode": "رمز التحقق",
+  "@verifyCode": {},
+  "enterVerifyCode": "أدخل رمز التحقق الخاص بك",
+  "@enterVerifyCode": {},
+  "verifyCodeRequired": "رمز التحقق مطلوب",
+  "@verifyCodeRequired": {},
+  "register": "تسجيل",
+  "@register": {},
+  "confirm": "تأكيد",
+  "@confirm": {}
+}

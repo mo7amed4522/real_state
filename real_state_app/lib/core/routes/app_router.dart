@@ -2,6 +2,8 @@
 
 import 'package:go_router/go_router.dart';
 import 'package:real_state_app/presentation/views/register_view.dart';
+import 'package:real_state_app/presentation/views/upload_photo.dart';
+import 'package:real_state_app/presentation/views/verifiy_code_view.dart';
 import '../../presentation/views/home_view.dart';
 import '../../presentation/views/login_view.dart';
 import '../../presentation/views/forgot_password_view.dart';
@@ -18,6 +20,14 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/register-screen',
       builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/verify-screen',
+      builder: (context, state) => const VerifyCodeScreen(),
+    ),
+    GoRoute(
+      path: '/uploadphoto-screen',
+      builder: (context, state) => const UploadPhotoScreen(),
     ),
   ],
 );

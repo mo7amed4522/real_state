@@ -43,7 +43,17 @@ class UploadPhotoScreen extends StatelessWidget {
               ? CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
                     leading: GestureDetector(
-                      onTap: () => Navigator.of(context).maybePop(),
+                      onTap: () {
+                        Future.microtask(() {
+                          if (context.mounted &&
+                              Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).canPop()) {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          }
+                        });
+                      },
                       child: Icon(
                         CupertinoIcons.back,
                         color: cupertinoTheme.brightness == Brightness.dark

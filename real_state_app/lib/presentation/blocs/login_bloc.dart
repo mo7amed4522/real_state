@@ -1,8 +1,13 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, must_be_immutable
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:real_state_app/domain/entities/user_entity.dart';
+import 'package:real_state_app/domain/usecases/login_usecase.dart';
+import 'package:real_state_app/presentation/widgets/loader.dart';
 
 // Events
 abstract class LoginEvent extends Equatable {
@@ -25,7 +30,12 @@ class PasswordChanged extends LoginEvent {
   List<Object?> get props => [password];
 }
 
-class LoginSubmitted extends LoginEvent {}
+class LoginSubmitted extends LoginEvent {
+  final BuildContext context;
+  const LoginSubmitted(this.context);
+  @override
+  List<Object?> get props => [context];
+}
 
 class TogglePasswordVisibility extends LoginEvent {}
 
@@ -108,7 +118,8 @@ class LoginState extends Equatable {
 
 // Bloc
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(const LoginState()) {
+  final LoginUseCase loginUseCase;
+  LoginBloc({required this.loginUseCase}) : super(LoginState()) {
     on<EmailChanged>(_onEmailChanged);
     on<PasswordChanged>(_onPasswordChanged);
     on<LoginSubmitted>(_onLoginSubmitted);
@@ -156,11 +167,83 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     emit(
       state.copyWith(isSubmitting: true, isFailure: false, isSuccess: false),
     );
-    // Simulate login delay
-    await Future.delayed(const Duration(seconds: 1));
-    // Here you would call your repository/auth API
-    // For now, always succeed
-    emit(state.copyWith(isSubmitting: false, isSuccess: true));
+    Loader().lottieLoader(event.context);
+    try {
+      final entity = UserEntity(email: state.email, password: state.password);
+      final result = await loginUseCase(entity);
+      Future.microtask(() {
+        if (event.context.mounted &&
+            Navigator.of(event.context, rootNavigator: true).canPop()) {
+          Navigator.of(event.context, rootNavigator: true).pop();
+        }
+      });
+      if (result.isSuccess) {
+        emit(state.copyWith(isSubmitting: false, isSuccess: true));
+        if (result.status == "pending_verification") {
+          event.context.go('/verify-screen');
+        } else if (result.status == "active") {
+          event.context.go('/home');
+        } else {
+          final isIOS = Theme.of(event.context).platform == TargetPlatform.iOS;
+          if (isIOS) {
+            showCupertinoDialog(
+              context: event.context,
+              builder: (context) => CupertinoAlertDialog(
+                title: Text('Login Failed'),
+                content: Text('Login failed. Please try again.'),
+                actions: [
+                  CupertinoDialogAction(
+                    child: Text('OK'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(event.context).showSnackBar(
+              SnackBar(
+                content: Text('Login failed. Please try again.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } else {
+        emit(state.copyWith(isSubmitting: false, isFailure: true));
+      }
+    } catch (e) {
+      Future.microtask(() {
+        if (event.context.mounted &&
+            Navigator.of(event.context, rootNavigator: true).canPop()) {
+          Navigator.of(event.context, rootNavigator: true).pop();
+        }
+        final isIOS = Theme.of(event.context).platform == TargetPlatform.iOS;
+        if (isIOS) {
+          showCupertinoDialog(
+            context: event.context,
+            builder: (context) => CupertinoAlertDialog(
+              title: Text('Login Failed'),
+              content: Text('Login failed. Please try again.'),
+              actions: [
+                CupertinoDialogAction(
+                  child: Text('OK'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(event.context).showSnackBar(
+            SnackBar(
+              content: Text('Login failed. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+
+      emit(state.copyWith(isSubmitting: false, isFailure: true));
+    }
   }
 
   void _onTogglePasswordVisibility(

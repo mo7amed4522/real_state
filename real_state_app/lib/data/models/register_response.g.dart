@@ -10,12 +10,16 @@ RegisterResponse _$RegisterResponseFromJson(Map<String, dynamic> json) =>
     RegisterResponse(
       accessToken: json['access_token'] as String,
       user: User.fromJson(json['user'] as Map<String, dynamic>),
+      emailVerificationToken: json['emailVerificationToken'] as String,
+      testEmail: json['testEmail'] as String,
     );
 
 Map<String, dynamic> _$RegisterResponseToJson(RegisterResponse instance) =>
     <String, dynamic>{
       'access_token': instance.accessToken,
       'user': instance.user,
+      'emailVerificationToken': instance.emailVerificationToken,
+      'testEmail': instance.testEmail,
     };
 
 User _$UserFromJson(Map<String, dynamic> json) => User(

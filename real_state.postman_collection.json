@@ -237,6 +237,19 @@
 						},
 						"description": "Get current user's profile"
 					}
+				},
+				{
+					"name": "Get User Photo (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/user-photo/:folder/:filename",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "user-photo", ":folder", ":filename"]
+						},
+						"description": "Get a user's profile photo by folder and filename. Replace :folder and :filename with actual values from the upload response or user profile (avatarUrl)."
+					}
 				}
 			]
 		},

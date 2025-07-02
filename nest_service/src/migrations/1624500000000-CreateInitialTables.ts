@@ -30,6 +30,7 @@ export class CreateInitialTables1624500000000 implements MigrationInterface {
         "subscriptionExpiry" TIMESTAMP,
         "resetPasswordToken" character varying,
         "resetPasswordExpires" TIMESTAMP,
+        "emailVerificationToken" character varying,
         "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "UQ_users_email" UNIQUE ("email"),

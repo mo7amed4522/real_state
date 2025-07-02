@@ -15,7 +15,8 @@ import {
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
-  FileTypeValidator
+  FileTypeValidator,
+  Res
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
@@ -24,6 +25,9 @@ import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 import { RegisterUserDto, UpdateUserDto, ChangePasswordDto, ResetPasswordDto, SearchUsersDto, ForgotPasswordDto } from './dto/user.dto';
 import { UserRole } from './entities/user.entity';
+import { createReadStream, existsSync } from 'fs';
+import { join } from 'path';
+import { Response } from 'express';
 
 interface FileUpload {
   buffer: Buffer;
@@ -53,14 +57,29 @@ export class AuthController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), 
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
           new FileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }),
         ],
       }),
     )
-    file: FileUpload,
+    file: Express.Multer.File,
   ) {
     return this.authService.uploadUserPhoto(req.user.id, file);
+  }
+
+  @Get('user-photo/:folder/:filename')
+  async getUserPhoto(
+    @Param('folder') folder: string,
+    @Param('filename') filename: string,
+    @Res() res: Response,
+  ) {
+    const filePath = join(process.cwd(), 'uploads', 'users', folder, filename);
+    console.log('Looking for file:', filePath, 'Exists:', existsSync(filePath));
+    if (!existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+    const stream = createReadStream(filePath);
+    stream.pipe(res);
   }
 
   @Put('profile')

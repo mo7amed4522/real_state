@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
+import 'package:real_state_app/data/repositories/auth_repository_impl.dart';
+import 'package:real_state_app/domain/usecases/login_usecase.dart';
 import 'package:real_state_app/presentation/blocs/login_bloc.dart';
 import 'package:real_state_app/presentation/widgets/animated_photo.dart';
 import 'package:real_state_app/presentation/widgets/animated_text_form_field.dart';
@@ -17,12 +19,14 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     return BlocProvider(
-      create: (_) => LoginBloc(),
+      create: (_) =>
+          LoginBloc(loginUseCase: LoginUseCase(AuthRepositoryImpl())),
       child: isIOS
           ? CupertinoPageScaffold(
               navigationBar: CupertinoNavigationBar(
                 middle: Text(
-                  AppLocalizations.of(context)?.welcome ?? 'Welcome Back',
+                  AppLocalizations.of(context)?.appTitle ?? 'Real Estate App',
+                  style: const TextStyle(fontFamily: 'SFProDisplay'),
                 ),
                 backgroundColor: CupertinoColors.systemBackground,
                 border: null,
@@ -56,7 +60,7 @@ class LoginScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 28,
-                                  fontFamily: '.SF Pro Text',
+                                  fontFamily: 'SFProDisplay',
                                   color:
                                       CupertinoTheme.of(context).brightness ==
                                           Brightness.dark
@@ -73,12 +77,19 @@ class LoginScreen extends StatelessWidget {
                                     'Email',
                                 icon: CupertinoIcons.mail,
                                 obscureText: false,
-                                hintText: 'Enter your email',
+                                hintText:
+                                    AppLocalizations.of(
+                                      context,
+                                    )?.enterValidEmail ??
+                                    "Enter your E-mail",
                                 onChanged: (value) =>
                                     bloc.add(EmailChanged(value)),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Email is required';
+                                    return AppLocalizations.of(
+                                          context,
+                                        )?.emailRequired ??
+                                        "E-mail is required";
                                   }
                                   return null;
                                 },
@@ -94,12 +105,19 @@ class LoginScreen extends StatelessWidget {
                                 passwordVisible: state.showPassword,
                                 onTogglePasswordVisibility: () =>
                                     bloc.add(TogglePasswordVisibility()),
-                                hintText: 'Enter your password',
+                                hintText:
+                                    AppLocalizations.of(
+                                      context,
+                                    )?.enterPassword ??
+                                    "Enter your Password",
                                 onChanged: (value) =>
                                     bloc.add(PasswordChanged(value)),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Password is required';
+                                    return AppLocalizations.of(
+                                          context,
+                                        )?.passwordRequired ??
+                                        "Password required";
                                   }
                                   return null;
                                 },
@@ -116,13 +134,15 @@ class LoginScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 32),
                               CupertinoButton.filled(
-                                onPressed: () => bloc.add(LoginSubmitted()),
+                                onPressed: () =>
+                                    bloc.add(LoginSubmitted(context)),
                                 child: Text(
                                   AppLocalizations.of(context)?.login ??
                                       'Login',
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
+                                    fontFamily: 'SFProDisplay',
                                   ),
                                 ),
                               ),
@@ -134,15 +154,23 @@ class LoginScreen extends StatelessWidget {
                                         context,
                                       )?.forgotPassword ??
                                       'Forgot Password?',
-                                  style: const TextStyle(fontSize: 16),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'SFProDisplay',
+                                  ),
                                 ),
                               ),
                               CupertinoButton(
                                 onPressed: () => context.go('/register-screen'),
                                 child: Text(
-                                  AppLocalizations.of(context)?.register ??
+                                  AppLocalizations.of(
+                                        context,
+                                      )?.doNotHaveAccount ??
                                       "Don't have an account? Register",
-                                  style: const TextStyle(fontSize: 16),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'SFProDisplay',
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -194,6 +222,7 @@ class LoginScreen extends StatelessWidget {
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 28,
+                                    fontFamily: 'SFProDisplay',
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -257,15 +286,20 @@ class LoginScreen extends StatelessWidget {
                                   textStyle: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
+                                    fontFamily: 'SFProDisplay',
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                onPressed: () => bloc.add(LoginSubmitted()),
+                                onPressed: () =>
+                                    bloc.add(LoginSubmitted(context)),
                                 child: Text(
                                   AppLocalizations.of(context)?.login ??
                                       'Login',
+                                  style: const TextStyle(
+                                    fontFamily: 'SFProDisplay',
+                                  ),
                                 ),
                               ),
                             ),
@@ -275,7 +309,10 @@ class LoginScreen extends StatelessWidget {
                               child: Text(
                                 AppLocalizations.of(context)?.forgotPassword ??
                                     'Forgot Password?',
-                                style: const TextStyle(fontSize: 16),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'SFProDisplay',
+                                ),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -284,7 +321,10 @@ class LoginScreen extends StatelessWidget {
                               child: Text(
                                 AppLocalizations.of(context)?.register ??
                                     "Don't have an account? Register",
-                                style: const TextStyle(fontSize: 16),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'SFProDisplay',
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -323,6 +363,7 @@ class PasswordHints extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             color: Theme.of(context).colorScheme.onBackground,
+            fontFamily: 'SFProDisplay',
           ),
         ),
         const SizedBox(height: 4),
@@ -341,6 +382,7 @@ class PasswordHints extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 color: Theme.of(context).colorScheme.onBackground,
+                fontFamily: 'SFProDisplay',
               ),
             ),
           ],
@@ -360,6 +402,7 @@ class PasswordHints extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 color: Theme.of(context).colorScheme.onBackground,
+                fontFamily: 'SFProDisplay',
               ),
             ),
           ],
@@ -379,6 +422,7 @@ class PasswordHints extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 color: Theme.of(context).colorScheme.onBackground,
+                fontFamily: 'SFProDisplay',
               ),
             ),
           ],
