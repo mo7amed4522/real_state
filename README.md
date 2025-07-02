@@ -14,6 +14,8 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 
 ---
 
@@ -94,6 +96,7 @@ flowchart TD
 - **Kafka** is the backbone for real-time event streaming and inter-service communication. All services publish and subscribe to relevant topics for instant updates.
 - **PostgreSQL** is the main data store, accessed by all services for persistent data.
 - **pgAdmin** provides a UI for database management and inspection.
+- **Flutter** (in `real_state_app/`) is used for the cross-platform mobile application, leveraging modern state management and local storage solutions for a seamless user experience.
 - **Redis** is used for caching, real-time pub/sub, and distributed locking (via RedLock).
 
 This architecture enables:
@@ -120,6 +123,7 @@ All services are containerized with Docker Compose for easy local development an
 
 ## ✨ Features
 - **Microservices architecture** (Django, NestJS, .NET)
+- **Flutter mobile app** (with advanced state management and secure local chat storage)
 - **JWT authentication** and role-based access
 - **Real-time chat** with Django Channels and Redis
 - **AI-powered property image/location analysis**
@@ -129,6 +133,13 @@ All services are containerized with Docker Compose for easy local development an
 - **Postman collection for all endpoints**
 - **Hot reload for all services in development**
 - **Easy local setup with Docker Compose**
+- **Flutter app uses:**
+  - `flutter_bloc` for state management
+  - `equatable` for value equality
+  - `go_router` for declarative routing
+  - `json_serializable` for model serialization
+  - `flutter_localizations` for multi-language support
+  - `hive` for secure local database (used to store chat data and room information securely)
 
 ---
 
@@ -137,10 +148,24 @@ All services are containerized with Docker Compose for easy local development an
 - **Django** (Python, Channels, REST Framework) — Real-time chat, property management, AI features
 - **NestJS** (Node.js, TypeScript) — Authentication, user management, REST APIs
 - **.NET Core** (C#) — Payment module, Stripe, Google/Apple Pay, RedLock, advanced logging
+- **Flutter** (Dart, `real_state_app/`) — Cross-platform mobile app using `flutter_bloc`, `equatable`, `go_router`, `json_serializable`, `flutter_localizations`, and `hive` for secure local chat and room storage
 - **PostgreSQL** — Main database
 - **Redis** — Real-time, cache, distributed locks
 - **Docker & Docker Compose** — Containerization and orchestration
 - **pgAdmin** — Database management UI
+
+## 📱 Mobile App (Flutter)
+
+The `real_state_app/` directory contains a cross-platform Flutter application for iOS, Android, macOS, Windows, and Linux.
+
+- Uses `flutter_bloc` for state management, `hive` for secure local chat storage, and supports multiple languages.
+- Integrates with backend microservices for authentication, real-time chat, property management, and payments.
+- To run locally:
+  ```sh
+  cd real_state_app
+  flutter pub get
+  flutter run
+  ```
 
 ---
 
@@ -254,6 +279,8 @@ docker-compose exec django_service python manage.py migrate
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg" height="40" alt="Django"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nestjs/nestjs-plain.svg" height="40" alt="NestJS"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dot-net/dot-net-plain.svg" height="40" alt=".NET"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-plain.svg" height="40" alt="Flutter"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-plain.svg" height="40" alt="Dart"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-plain.svg" height="40" alt="PostgreSQL"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-plain.svg" height="40" alt="Redis"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-plain.svg" height="40" alt="Docker"/>
@@ -284,6 +311,23 @@ Contributions are welcome! To contribute:
 
 Please follow the existing code style and add tests where appropriate.
 
+### 📱 Contributing to the Mobile App
+
+- Ensure you have Flutter SDK (see `real_state_app/pubspec.yaml` for version).
+- Run `flutter pub get` before making changes.
+- Follow the existing folder structure and use `flutter_bloc` for state management.
+- Run tests with `flutter test` before submitting a PR.
+- For localization, update ARB files in `lib/l10n/`.
+
+---
+
+## 🛡️ Security
+
+- Sensitive data (API keys, secrets, DB credentials, etc.) are stored in `.env` files for each service and are not committed to version control.
+- Never share or commit your `.env` files.
+- JWT is used for authentication across all services.
+- The Flutter app uses secure local storage (Hive) for sensitive chat and room data.
+
 ---
 
 ## 🛠️ Troubleshooting
@@ -305,20 +349,6 @@ Please follow the existing code style and add tests where appropriate.
 
 If you encounter issues not listed here, please open an issue with logs and steps to reproduce.
 
----
-
-## 🖼️ Screenshots
-
-> _Add your own screenshots here!_
-
-- **Postman Collection Example:**
-  ![Postman Collection](https://user-images.githubusercontent.com/your-username/postman-example.png)
-- **Docker Compose Running:**
-  ![Docker Compose](https://user-images.githubusercontent.com/your-username/docker-compose-example.png)
-- **pgAdmin UI:**
-  ![pgAdmin](https://user-images.githubusercontent.com/your-username/pgadmin-example.png)
-
----
 
 ## 📄 License
 

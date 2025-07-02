@@ -3,6 +3,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:real_state_app/data/datasources/local_storage.dart';
+import 'package:real_state_app/data/models/get_own_data_request.dart';
 import 'package:real_state_app/data/models/login_request.dart';
 import 'package:real_state_app/data/models/login_response.dart';
 import 'package:real_state_app/domain/entities/user_entity.dart';
@@ -44,6 +45,25 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     } catch (e) {
       return AuthResult(isSuccess: false, error: e.toString(), status: "Error");
+    }
+  }
+
+  Future<GetOwnDataRequest> getOwnProfile(String token) async {
+    final response = await http.get(
+      Uri.parse(
+        dotenv.env['HTTP_GET_OWN_PROFILE'] ??
+            'https://your.api.url/auth/profile',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return GetOwnDataRequest.fromJson(data);
+    } else {
+      throw Exception('Failed to fetch profile');
     }
   }
 }

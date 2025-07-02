@@ -1,10 +1,14 @@
 // ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, must_be_immutable
 
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:real_state_app/data/datasources/local_storage.dart';
+import 'package:real_state_app/data/repositories/auth_repository_impl.dart';
 import 'package:real_state_app/domain/entities/user_entity.dart';
 import 'package:real_state_app/domain/usecases/login_usecase.dart';
 import 'package:real_state_app/presentation/widgets/loader.dart';
@@ -182,6 +186,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         if (result.status == "pending_verification") {
           event.context.go('/verify-screen');
         } else if (result.status == "active") {
+          final authRepo = AuthRepositoryImpl();
+          final profile = await authRepo.getOwnProfile(result.token!);
+          await LocalStorage.saveProfile(jsonEncode(profile.toJson()));
           event.context.go('/home');
         } else {
           final isIOS = Theme.of(event.context).platform == TargetPlatform.iOS;

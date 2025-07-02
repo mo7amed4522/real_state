@@ -1,6 +1,7 @@
 // ignore_for_file: unused_import
 
 import 'package:go_router/go_router.dart';
+import 'package:real_state_app/data/datasources/local_storage.dart';
 import 'package:real_state_app/presentation/views/register_view.dart';
 import 'package:real_state_app/presentation/views/upload_photo.dart';
 import 'package:real_state_app/presentation/views/verifiy_code_view.dart';
@@ -30,4 +31,15 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const UploadPhotoScreen(),
     ),
   ],
+  redirect: (context, state) async {
+    final profile = await LocalStorage.getProfile();
+    final isLoggingIn = state.matchedLocation == '/';
+    if (profile != null && isLoggingIn) {
+      return '/home';
+    }
+    if (profile == null && !isLoggingIn) {
+      return '/';
+    }
+    return null;
+  },
 );

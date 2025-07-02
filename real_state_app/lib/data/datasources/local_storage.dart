@@ -25,4 +25,14 @@ class LocalStorage {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
+
+  static Future<void> saveProfile(String profileJson) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_profile', profileJson);
+  }
+
+  static Future<String?> getProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_profile');
+  }
 }
