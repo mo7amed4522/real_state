@@ -4,7 +4,11 @@ import { PropertyType, PropertyStatus } from '../entities/property.entity';
 export class CreatePropertyDto {
   @IsString()
   @IsNotEmpty()
-  title: string;
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  title?: string;
 
   @IsString()
   @IsOptional()
@@ -26,9 +30,43 @@ export class CreatePropertyDto {
 
   @IsUUID()
   companyId: string;
+
+  @IsNumber()
+  @IsOptional()
+  sellingPriceInclVat?: number;
+
+  @IsNumber()
+  @IsOptional()
+  landRegistrationFee?: number;
+
+  @IsNumber()
+  @IsOptional()
+  oqoodAmount?: number;
+
+  @IsNumber()
+  @IsOptional()
+  applicableFeesToDubaiLandDepartment?: number;
+
+  @IsString()
+  @IsOptional()
+  propertyUsage?: string;
+
+  @IsNumber()
+  @IsOptional()
+  plotAreaSqFt?: number;
+
+  @IsOptional()
+  amenities?: string[];
+
+  @IsOptional()
+  paymentPlan?: { milestone: string; percent: number; aed: number }[];
 }
 
 export class UpdatePropertyDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
   @IsString()
   @IsOptional()
   title?: string;
@@ -52,4 +90,34 @@ export class UpdatePropertyDto {
   @IsBoolean()
   @IsOptional()
   isFeatured?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  sellingPriceInclVat?: number;
+
+  @IsNumber()
+  @IsOptional()
+  landRegistrationFee?: number;
+
+  @IsNumber()
+  @IsOptional()
+  oqoodAmount?: number;
+
+  @IsNumber()
+  @IsOptional()
+  applicableFeesToDubaiLandDepartment?: number;
+
+  @IsString()
+  @IsOptional()
+  propertyUsage?: string;
+
+  @IsNumber()
+  @IsOptional()
+  plotAreaSqFt?: number;
+
+  @IsOptional()
+  amenities?: string[];
+
+  @IsOptional()
+  paymentPlan?: { milestone: string; percent: number; aed: number }[];
 } 

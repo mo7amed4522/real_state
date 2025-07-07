@@ -286,3 +286,4 @@
 /src/obj/Debug/net8.0/dotnet_service.pdb
 /src/obj/Debug/net8.0/dotnet_service.genruntimeconfig.cache
 /src/obj/Debug/net8.0/ref/dotnet_service.dll
+/Users/5ald/projects/real_state/dotnet_service/obj/Debug/net8.0/dotnet_service.sourcelink.json

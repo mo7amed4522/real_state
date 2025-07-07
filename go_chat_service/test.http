@@ -1,0 +1,55 @@
+### Health Check
+GET http://localhost:8081/health
+
+### Get All Users
+GET http://localhost:8081/api/v1/users/
+
+### Get Active Users
+GET http://localhost:8081/api/v1/users/active
+
+### Get Users by Role (Buyer)
+GET http://localhost:8081/api/v1/users/role/buyer
+
+### Get Users by Role (Developer)
+GET http://localhost:8081/api/v1/users/role/developer
+
+### Get Users by Role (Broker)
+GET http://localhost:8081/api/v1/users/role/broker
+
+### Get Users by Role (Admin)
+GET http://localhost:8081/api/v1/users/role/admin
+
+### Get User by ID (replace with actual UUID)
+GET http://localhost:8081/api/v1/users/your-user-uuid-here
+
+### Get User Conversations (replace with actual UUID)
+GET http://localhost:8081/api/v1/chat/conversations/your-user-uuid-here
+
+### Create Conversation (replace with actual UUIDs)
+POST http://localhost:8081/api/v1/chat/conversations
+Content-Type: application/json
+
+{
+  "user1Id": "user-uuid-1",
+  "user2Id": "user-uuid-2"
+}
+
+### Send Message (replace with actual UUIDs)
+POST http://localhost:8081/api/v1/chat/messages
+Content-Type: application/json
+
+{
+  "conversationId": "conversation-uuid",
+  "senderId": "user-uuid-1",
+  "content": "Hello! This is a test message.",
+  "messageType": "text"
+}
+
+### Get Conversation Messages (replace with actual UUID)
+GET http://localhost:8081/api/v1/chat/conversations/conversation-uuid/messages?limit=50&offset=0
+
+### Mark Conversation as Read (replace with actual UUIDs)
+PUT http://localhost:8081/api/v1/chat/conversations/conversation-uuid/read?user_id=user-uuid
+
+### Get Unread Message Count (replace with actual UUID)
+GET http://localhost:8081/api/v1/chat/users/user-uuid/unread-count 

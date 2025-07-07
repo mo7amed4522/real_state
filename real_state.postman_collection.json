@@ -8,7 +8,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8000",
+			"value": "http://localhost:3000",
 			"type": "string"
 		},
 		{
@@ -45,6 +45,17 @@
 			"key": "dotnet_base_url",
 			"value": "http://localhost:5000",
 			"type": "string"
+		},
+
+		{
+			"key": "developer_id",
+			"value": "2f84f992-e77d-4b94-b14a-668e59280d0c",
+			"type": "string"
+		},
+		{
+			"key": "buyer_id",
+			"value": "676b10d1-b8c1-46ae-81ab-fe7714907273",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -63,7 +74,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"+1234567890\",\n    \"role\": \"buyer\",\n    \"company\": \"Example Corp\",\n    \"licenseNumber\": \"LIC123456\"\n}"
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"countryCode\": \"+1\",\n    \"phoneNumber\": \"1234567890\",\n    \"role\": \"buyer\",\n    \"company\": \"Example Corp\",\n    \"licenseNumber\": \"LIC123456\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -421,7 +432,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Luxury Villa with Ocean View\",\n    \"description\": \"A beautiful villa with a stunning view of the ocean.\",\n    \"price\": 1250000,\n    \"propertyType\": \"villa\",\n    \"companyId\": \"{{companyId}}\"\n}",
+							"raw": "{\n    \"name\": \"Luxury Villa\",\n    \"title\": \"Luxury Villa with Ocean View\",\n    \"description\": \"A beautiful villa with a stunning view of the ocean.\",\n    \"price\": 1250000,\n    \"propertyType\": \"villa\",\n    \"status\": \"published\",\n    \"companyId\": \"{{companyId}}\",\n    \"sellingPriceInclVat\": 1300000,\n    \"landRegistrationFee\": 20000,\n    \"oqoodAmount\": 5000,\n    \"applicableFeesToDubaiLandDepartment\": 10000,\n    \"propertyUsage\": \"residential\",\n    \"plotAreaSqFt\": 3500,\n    \"amenities\": [\n      \"REFRESHING ADULT AND KIDS' POOLS\",\n      \"CUTTING-EDGE GYM FACILITIES\",\n      \"MULTI-USE COMMUNITY ROOM\",\n      \"LUSH LANDSCAPED GARDENS\",\n      \"OUTDOOR BBQ AND LOUNGE AREAS\",\n      \"PLAY AREAS FOR THE LITTLE ONES\"\n    ],\n    \"paymentPlan\": [\n      { \"milestone\": \"1st Installment\", \"percent\": 10, \"aed\": 169589 },\n      { \"milestone\": \"2nd Installment\", \"percent\": 10, \"aed\": 169589 },\n      { \"milestone\": \"3rd Installment\", \"percent\": 10, \"aed\": 169589 },\n      { \"milestone\": \"4th Installment\", \"percent\": 10, \"aed\": 169589 },\n      { \"milestone\": \"5th Installment\", \"percent\": 10, \"aed\": 169589 },\n      { \"milestone\": \"6th Installment\", \"percent\": 5, \"aed\": 84794 },\n      { \"milestone\": \"50% Construction\", \"percent\": 10, \"aed\": 169589 },\n      { \"milestone\": \"70% Construction\", \"percent\": 5, \"aed\": 84794 },\n      { \"milestone\": \"90% Construction\", \"percent\": 10, \"aed\": 169589 },\n      { \"milestone\": \"100% Construction and Handover\", \"percent\": 20, \"aed\": 339177 }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -479,7 +490,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"price\": 1300000,\n    \"status\": \"under-offer\"\n}",
+							"raw": "{\n    \"name\": \"Luxury Villa\",\n    \"price\": 1300000,\n    \"status\": \"under-offer\",\n    \"sellingPriceInclVat\": 1350000,\n    \"landRegistrationFee\": 21000,\n    \"oqoodAmount\": 5500,\n    \"applicableFeesToDubaiLandDepartment\": 11000,\n    \"propertyUsage\": \"residential\",\n    \"plotAreaSqFt\": 3600,\n    \"amenities\": [\n      \"REFRESHING ADULT AND KIDS' POOLS\",\n      \"CUTTING-EDGE GYM FACILITIES\"\n    ],\n    \"paymentPlan\": [\n      { \"milestone\": \"1st Installment\", \"percent\": 10, \"aed\": 170000 }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -810,127 +821,6 @@
 			"name": "Chat",
 			"item": [
 				{
-					"name": "Send Message",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"chat_room\": \"{{room_id}}\",\n  \"content\": \"Hello, this is a message!\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/chat/send",
-							"host": ["{{base_url}}"],
-							"path": ["chat", "send"]
-						}
-					}
-				},
-				{
-					"name": "Get All Chat Rooms",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/chat/rooms",
-							"host": ["{{base_url}}"],
-							"path": ["chat", "rooms"]
-						}
-					}
-				},
-				{
-					"name": "Get Messages in Room",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/chat/room/{{room_id}}/messages",
-							"host": ["{{base_url}}"],
-							"path": ["chat", "room", "{{room_id}}", "messages"]
-						}
-					}
-				},
-				{
-					"name": "Get Unread Notifications",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/chat/notifications/unread",
-							"host": ["{{base_url}}"],
-							"path": ["chat", "notifications", "unread"]
-						}
-					}
-				},
-				{
-					"name": "Mark Notification as Read",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/chat/notifications/mark-read/{{notification_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["chat", "notifications", "mark-read", "{{notification_id}}"]
-						}
-					}
-				},
-				{
-					"name": "Join Chat Room (WebSocket)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Use a WebSocket client to connect to ws://localhost:8000/ws/chat/{{room_id}}/",
-									"// Send JSON: {\"sender_id\":\"<user_uuid>\", \"content\":\"Hello!\"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabled": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "ws://localhost:8000/ws/chat/{{room_id}}/",
-							"host": ["ws://localhost:8000"],
-							"path": ["ws", "chat", "{{room_id}}", ""]
-						},
-						"description": "Use a WebSocket client to connect to this URL."
-					}
-				},
-				{
 					"name": "Create Chat Room",
 					"request": {
 						"method": "POST",
@@ -946,13 +836,32 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"buyer\": \"<buyer_user_id>\",\n  \"seller\": \"<seller_user_id>\",\n  \"property\": \"<property_id>\"\n}"
+							"raw": "{\n  \"buyer\": \"<buyer_user_id>\",\n  \"seller\": \"<seller_user_id>\",\n  \"property_id\": \"<property_id>\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/chat/rooms/",
+							"raw": "{{base_url}}/api/chat/rooms/",
 							"host": ["{{base_url}}"],
-							"path": ["chat", "rooms", ""]
-						}
+							"path": ["api", "chat", "rooms", ""]
+						},
+						"description": "Create a new chat room between buyer and seller"
+					}
+				},
+				{
+					"name": "List Chat Rooms",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/chat/rooms/list/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "rooms", "list", ""]
+						},
+						"description": "Get all chat rooms for the authenticated user"
 					}
 				},
 				{
@@ -966,14 +875,15 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/chat/rooms/{{room_id}}/",
+							"raw": "{{base_url}}/api/chat/rooms/{{room_id}}/",
 							"host": ["{{base_url}}"],
-							"path": ["chat", "rooms", "{{room_id}}", ""]
-						}
+							"path": ["api", "chat", "rooms", "{{room_id}}", ""]
+						},
+						"description": "Delete a chat room (only room participants can delete)"
 					}
 				},
 				{
-					"name": "Mute Chat Room",
+					"name": "Mute/Unmute Chat Room",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -988,13 +898,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"room_id\": \"{{room_id}}\",\n  \"mute\": true\n}"
+							"raw": "{\n  \"mute\": true\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/chat/rooms/{{room_id}}/mute/",
+							"raw": "{{base_url}}/api/chat/rooms/{{room_id}}/mute/",
 							"host": ["{{base_url}}"],
-							"path": ["chat", "rooms", "{{room_id}}", "mute", ""]
-						}
+							"path": ["api", "chat", "rooms", "{{room_id}}", "mute", ""]
+						},
+						"description": "Mute or unmute a chat room for the authenticated user"
 					}
 				},
 				{
@@ -1013,13 +924,58 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"room_id\": \"{{room_id}}\",\n  \"user_id\": \"<user_id_to_remove>\"\n}"
+							"raw": "{\n  \"user_id\": \"<user_id_to_remove>\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/chat/rooms/{{room_id}}/remove/",
+							"raw": "{{base_url}}/api/chat/rooms/{{room_id}}/remove/",
 							"host": ["{{base_url}}"],
-							"path": ["chat", "rooms", "{{room_id}}", "remove", ""]
-						}
+							"path": ["api", "chat", "rooms", "{{room_id}}", "remove", ""]
+						},
+						"description": "Remove a user from a chat room (only seller or admin can remove users)"
+					}
+				},
+				{
+					"name": "List Messages in Room",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/chat/rooms/{{room_id}}/messages/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "rooms", "{{room_id}}", "messages", ""]
+						},
+						"description": "Get all messages in a specific chat room"
+					}
+				},
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"chat_room\": \"{{room_id}}\",\n  \"content\": \"Hello, this is a message!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/messages/send/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "messages", "send", ""]
+						},
+						"description": "Send a message to a chat room (includes AI moderation)"
 					}
 				},
 				{
@@ -1033,10 +989,29 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/chat/message/{{message_id}}/mark-read/",
+							"raw": "{{base_url}}/api/chat/messages/{{message_id}}/read/",
 							"host": ["{{base_url}}"],
-							"path": ["chat", "message", "{{message_id}}", "mark-read", ""]
-						}
+							"path": ["api", "chat", "messages", "{{message_id}}", "read", ""]
+						},
+						"description": "Mark a specific message as read"
+					}
+				},
+				{
+					"name": "Mark All Messages as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/chat/rooms/{{room_id}}/read/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "rooms", "{{room_id}}", "read", ""]
+						},
+						"description": "Mark all messages in a room as read"
 					}
 				},
 				{
@@ -1050,21 +1025,23 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/chat/message/{{message_id}}/moderate/",
+							"raw": "{{base_url}}/api/chat/messages/{{message_id}}/moderate/",
 							"host": ["{{base_url}}"],
-							"path": ["chat", "message", "{{message_id}}", "moderate", ""]
-						}
+							"path": ["api", "chat", "messages", "{{message_id}}", "moderate", ""]
+						},
+						"description": "Flag a message for AI moderation"
 					}
 				},
 				{
-					"name": "WebSocket: Mark Message as Read (Real-Time)",
+					"name": "WebSocket: Connect to Chat Room",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Connect to ws://localhost:8000/ws/chat/{{room_id}}/",
-									"// Send: {\"type\": \"read\", \"message_id\": \"{{message_id}}\"}"
+									"// Connect to WebSocket: ws://localhost:8000/ws/chat/{{room_id}}/",
+									"// Send message: {\"sender_id\": \"<user_id>\", \"content\": \"Hello!\"}",
+									"// Send read receipt: {\"type\": \"read\", \"message_id\": \"<message_id>\"}"
 								],
 								"type": "text/javascript"
 							}
@@ -1081,38 +1058,200 @@
 							"host": ["ws://localhost:8000"],
 							"path": ["ws", "chat", "{{room_id}}", ""]
 						},
-						"description": "WebSocket: Send {\"type\": \"read\", \"message_id\": \"{{message_id}}\"} to mark as read."
-					}
-				},
-				{
-					"name": "WebSocket: Send Message (Real-Time)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Connect to ws://localhost:8000/ws/chat/{{room_id}}/",
-									"// Send: {\"sender_id\": \"<user_id>\", \"content\": \"Hello in real-time!\"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabled": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "ws://localhost:8000/ws/chat/{{room_id}}/",
-							"host": ["ws://localhost:8000"],
-							"path": ["ws", "chat", "{{room_id}}", ""]
-						},
-						"description": "WebSocket: Send {\"sender_id\": \"<user_id>\", \"content\": \"Hello in real-time!\"} to send a message."
+						"description": "WebSocket connection for real-time chat. Send JSON messages and receive real-time updates."
 					}
 				}
 			]
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/health",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["health"]
+				}
+			}
+		},
+		{
+			"name": "Get All Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/users/",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "users", ""]
+				}
+			}
+		},
+		{
+			"name": "Get Active Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/users/active",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "users", "active"]
+				}
+			}
+		},
+		{
+			"name": "Get User by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/users/{{user_id}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "users", "{{user_id}}"]
+				}
+			}
+		},
+		{
+			"name": "Get Users by Role",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/users/role/{{role}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "users", "role", "{{role}}"]
+				}
+			}
+		},
+		{
+			"name": "Get User Conversations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/chat/users/{{user_id}}/conversations",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "chat", "users", "{{user_id}}", "conversations"]
+				}
+			}
+		},
+		{
+			"name": "Create Conversation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user1Id\": \"{{user1_id}}\",\n  \"user2Id\": \"{{user2_id}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/v1/chat/conversations",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "chat", "conversations"]
+				}
+			}
+		},
+		{
+			"name": "Get Conversation Messages",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/chat/conversations/{{conversation_id}}/messages?limit=50&offset=0",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "chat", "conversations", "{{conversation_id}}", "messages"],
+					"query": [
+						{"key": "limit", "value": "50"},
+						{"key": "offset", "value": "0"}
+					]
+				}
+			}
+		},
+		{
+			"name": "Send Message",
+			"request": {
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"conversationId\": \"{{conversation_id}}\",\n  \"senderId\": \"{{sender_id}}\",\n  \"content\": \"Hello!\",\n  \"messageType\": \"text\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/v1/chat/messages",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "chat", "messages"]
+				}
+			}
+		},
+		{
+			"name": "Mark Conversation as Read",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/chat/conversations/{{conversation_id}}/read?user_id={{user_id}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "chat", "conversations", "{{conversation_id}}", "read"],
+					"query": [
+						{"key": "user_id", "value": "{{user_id}}"}
+					]
+				}
+			}
+		},
+		{
+			"name": "Get Unread Message Count",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/chat/users/{{user_id}}/unread-count",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "chat", "users", "{{user_id}}", "unread-count"]
+				}
+			}
+		},
+		{
+			"name": "WebSocket Info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "ws://localhost:8081/ws?user_id={{user_id}}",
+					"protocol": "ws",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["ws"],
+					"query": [
+						{"key": "user_id", "value": "{{user_id}}"}
+					]
+				}
+			}
 		}
 	],
 	"event": [

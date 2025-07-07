@@ -1,9 +1,12 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, HttpCode, HttpStatus, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, HttpCode, HttpStatus, UseInterceptors, UploadedFile, BadRequestException, Res } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto, UpdateCompanyDto } from './dto/company.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { ensureCompanyUploadDir, generateEncryptedFileName, getPublicFileUrl } from './utils/file-upload.utils';
+import { ensureCompanyUploadDir, generateEncryptedFileName, getPublicFileUrl, getFullLogoUrl, getLegacyLogoUrl } from './utils/file-upload.utils';
+import { createReadStream, existsSync } from 'fs';
+import { join } from 'path';
+import { Response } from 'express';
 
 @Controller('companies')
 export class CompaniesController {
@@ -61,7 +64,56 @@ export class CompaniesController {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    const logoUrl = getPublicFileUrl(companyId, file.filename);
-    return this.companiesService.updateLogo(companyId, logoUrl, file.filename);
+    
+    // Generate full URL for the logo
+    const logoUrl = getFullLogoUrl(companyId, file.filename);
+    
+    // Update company with full URL
+    const updatedCompany = await this.companiesService.updateLogo(companyId, logoUrl, file.filename);
+    
+    return {
+      company: updatedCompany,
+      logoUrl: logoUrl,
+      fileName: file.filename,
+      message: 'Logo uploaded successfully'
+    };
+  }
+
+  @Get('logo/:companyId/:filename')
+  async getCompanyLogo(
+    @Param('companyId') companyId: string,
+    @Param('filename') filename: string,
+    @Res() res: Response,
+  ) {
+    const filePath = join(process.cwd(), 'uploads', 'companies', companyId, filename);
+    console.log('Looking for company logo:', filePath, 'Exists:', existsSync(filePath));
+    
+    if (!existsSync(filePath)) {
+      return res.status(404).json({ message: 'Logo file not found' });
+    }
+    
+    const stream = createReadStream(filePath);
+    stream.pipe(res);
+  }
+
+  @Get(':id/logo-url')
+  async getLogoUrl(@Param('id') companyId: string) {
+    const company = await this.companiesService.findOne(companyId);
+    
+    if (!company.logoUrl) {
+      throw new BadRequestException('Company has no logo uploaded');
+    }
+    
+    return {
+      companyId: companyId,
+      logoUrl: company.logoUrl,
+      fileName: company.logoFileName,
+      message: 'Logo URL retrieved successfully'
+    };
+  }
+
+  @Get(':id/test-logo-url')
+  async testLogoUrl(@Param('id') companyId: string) {
+    return this.companiesService.testLogoUrl(companyId);
   }
 } 

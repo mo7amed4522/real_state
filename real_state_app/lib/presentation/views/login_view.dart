@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
 import 'package:real_state_app/data/repositories/auth_repository_impl.dart';
 import 'package:real_state_app/domain/usecases/login_usecase.dart';
-import 'package:real_state_app/presentation/blocs/login_bloc.dart';
+import 'package:real_state_app/presentation/bloc/login_bloc.dart';
 import 'package:real_state_app/presentation/widgets/animated_photo.dart';
 import 'package:real_state_app/presentation/widgets/animated_text_form_field.dart';
 import 'package:go_router/go_router.dart';
@@ -23,14 +23,6 @@ class LoginScreen extends StatelessWidget {
           LoginBloc(loginUseCase: LoginUseCase(AuthRepositoryImpl())),
       child: isIOS
           ? CupertinoPageScaffold(
-              navigationBar: CupertinoNavigationBar(
-                middle: Text(
-                  AppLocalizations.of(context)?.appTitle ?? 'Real Estate App',
-                  style: const TextStyle(fontFamily: 'SFProDisplay'),
-                ),
-                backgroundColor: CupertinoColors.systemBackground,
-                border: null,
-              ),
               child: SafeArea(
                 child: Material(
                   color: Colors.transparent,
@@ -148,7 +140,8 @@ class LoginScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 20),
                               CupertinoButton(
-                                onPressed: () => context.go('/forgot-password'),
+                                onPressed: () =>
+                                    context.push('/forgot-password'),
                                 child: Text(
                                   AppLocalizations.of(
                                         context,
@@ -161,7 +154,8 @@ class LoginScreen extends StatelessWidget {
                                 ),
                               ),
                               CupertinoButton(
-                                onPressed: () => context.go('/register-screen'),
+                                onPressed: () =>
+                                    context.push('/register-screen'),
                                 child: Text(
                                   AppLocalizations.of(
                                         context,

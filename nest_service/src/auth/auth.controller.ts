@@ -29,10 +29,6 @@ import { createReadStream, existsSync } from 'fs';
 import { join } from 'path';
 import { Response } from 'express';
 
-interface FileUpload {
-  buffer: Buffer;
-  originalname: string;
-}
 
 @Controller('auth')
 export class AuthController {

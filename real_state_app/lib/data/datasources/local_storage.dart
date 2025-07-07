@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
@@ -31,8 +33,10 @@ class LocalStorage {
     await prefs.setString('user_profile', profileJson);
   }
 
-  static Future<String?> getProfile() async {
+  static Future<Map> getProfile() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_profile');
+    final jsonString = prefs.getString('user_profile');
+    if (jsonString == null) return {};
+    return json.decode(jsonString) as Map<String, dynamic>;
   }
 }

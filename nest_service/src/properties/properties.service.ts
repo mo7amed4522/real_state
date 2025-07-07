@@ -115,4 +115,11 @@ export class PropertiesService {
     }
     return this.locationRepository.save(location);
   }
+
+  async findAllByCompany(companyId: string): Promise<Property[]> {
+    return this.propertyRepository.find({
+      where: { companyId },
+      relations: ['company', 'images', 'location', 'buildingInfo', 'view', 'tags'],
+    });
+  }
 } 

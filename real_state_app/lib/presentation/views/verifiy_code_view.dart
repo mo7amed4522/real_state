@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
 import 'package:real_state_app/data/repositories/verify_code_repository_impl.dart';
 import 'package:real_state_app/domain/usecases/verify_code_usecase.dart';
-import 'package:real_state_app/presentation/blocs/verify_code_bloc.dart';
+import 'package:real_state_app/presentation/bloc/verify_code_bloc.dart';
 import 'package:real_state_app/presentation/widgets/animated_photo.dart';
 import 'package:real_state_app/presentation/widgets/animated_text_form_field.dart';
 import 'package:real_state_app/l10n/app_localizations.dart';

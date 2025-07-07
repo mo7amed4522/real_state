@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Chat Service - Test Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .sidebar {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .chat-area {
+            flex: 2;
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+        .messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        .message.sent {
+            background-color: #007bff;
+            color: white;
+            margin-left: 20%;
+        }
+        .message.received {
+            background-color: #e9ecef;
+            margin-right: 20%;
+        }
+        .input-area {
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .input-area button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .input-area button:hover {
+            background-color: #0056b3;
+        }
+        .user-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .user-item:hover {
+            background-color: #f0f0f0;
+        }
+        .user-item.selected {
+            background-color: #007bff;
+            color: white;
+        }
+        .status {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ccc;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Go Chat Service - Test Client</h1>
+    
+    <div>
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" placeholder="Enter your user UUID" style="width: 300px;">
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <h3>Users</h3>
+            <div id="usersList"></div>
+        </div>
+        
+        <div class="chat-area">
+            <div id="status" class="status disconnected">Disconnected</div>
+            <div id="messages" class="messages"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentUserId = null;
+        let selectedUserId = null;
+        let users = [];
+
+        function connect() {
+            const userId = document.getElementById('userId').value.trim();
+            if (!userId) {
+                alert('Please enter a user ID');
+                return;
+            }
+
+            currentUserId = userId;
+            const wsUrl = `ws://localhost:8081/ws?user_id=${userId}`;
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function() {
+                updateStatus('Connected', true);
+                loadUsers();
+            };
+            
+            ws.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                handleIncomingMessage(message);
+            };
+            
+            ws.onclose = function() {
+                updateStatus('Disconnected', false);
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                updateStatus('Error', false);
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+            updateStatus('Disconnected', false);
+        }
+
+        function updateStatus(message, connected) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${connected ? 'connected' : 'disconnected'}`;
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('http://localhost:8081/api/v1/users/');
+                const data = await response.json();
+                users = data.users;
+                displayUsers();
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function displayUsers() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '';
+            
+            users.forEach(user => {
+                if (user.id !== currentUserId) {
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user-item';
+                    userDiv.textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+                    userDiv.onclick = () => selectUser(user.id);
+                    usersList.appendChild(userDiv);
+                }
+            });
+        }
+
+        function selectUser(userId) {
+            selectedUserId = userId;
+            
+            // Update UI to show selected user
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            event.target.classList.add('selected');
+            
+            // Clear messages and load conversation
+            document.getElementById('messages').innerHTML = '';
+            loadConversation(userId);
+        }
+
+        async function loadConversation(otherUserId) {
+            try {
+                // First, create or get conversation
+                const createResponse = await fetch('http://localhost:8081/api/v1/chat/conversations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user1Id: currentUserId,
+                        user2Id: otherUserId
+                    })
+                });
+                
+                const conversation = await createResponse.json();
+                
+                // Load messages
+                const messagesResponse = await fetch(`http://localhost:8081/api/v1/chat/conversations/${conversation.conversation.id}/messages`);
+                const messagesData = await messagesResponse.json();
+                
+                displayMessages(messagesData.messages);
+            } catch (error) {
+                console.error('Error loading conversation:', error);
+            }
+        }
+
+        function displayMessages(messages) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '';
+            
+            messages.reverse().forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.senderId === currentUserId ? 'sent' : 'received'}`;
+                messageDiv.innerHTML = `
+                    <strong>${message.sender.firstName} ${message.sender.lastName}:</strong><br>
+                    ${message.content}
+                `;
+                messagesDiv.appendChild(messageDiv);
+            });
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function handleIncomingMessage(message) {
+            if (message.type === 'chat_message') {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.data.senderId === currentUserId ? 'sent' : 'received'}`;
+                messageDiv.innerHTML = `
+                    <strong>${message.data.sender.firstName} ${message.data.sender.lastName}:</strong><br>
+                    ${message.data.content}
+                `;
+                
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
+
+        async function sendMessage() {
+            if (!selectedUserId) {
+                alert('Please select a user to chat with');
+                return;
+            }
+
+            const content = document.getElementById('messageInput').value.trim();
+            if (!content) return;
+
+            try {
+                // Create or get conversation
+                const createResponse = await fetch('http://localhost:8081/api/v1/chat/conversations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user1Id: currentUserId,
+                        user2Id: selectedUserId
+                    })
+                });
+                
+                const conversation = await createResponse.json();
+                
+                // Send message
+                const messageResponse = await fetch('http://localhost:8081/api/v1/chat/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        conversationId: conversation.conversation.id,
+                        senderId: currentUserId,
+                        content: content,
+                        messageType: 'text'
+                    })
+                });
+                
+                if (messageResponse.ok) {
+                    document.getElementById('messageInput').value = '';
+                    
+                    // Send via WebSocket for real-time
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            type: 'chat_message',
+                            data: {
+                                conversationId: conversation.conversation.id,
+                                senderId: currentUserId,
+                                content: content,
+                                messageType: 'text'
+                            }
+                        }));
+                    }
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html> 

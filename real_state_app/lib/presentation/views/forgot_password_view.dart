@@ -4,11 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
-import 'package:real_state_app/presentation/blocs/forgot_password_bloc.dart';
+import 'package:real_state_app/presentation/bloc/forgot_password_bloc.dart';
 import 'package:real_state_app/presentation/widgets/animated_photo.dart';
 import 'package:real_state_app/presentation/widgets/animated_text_form_field.dart';
 import 'package:real_state_app/l10n/app_localizations.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:go_router/go_router.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -55,7 +56,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               Future.microtask(() {
                 if (context.mounted &&
                     Navigator.of(context, rootNavigator: true).canPop()) {
-                  Navigator.of(context, rootNavigator: true).pop();
+                  context.pop();
                 }
               });
             },

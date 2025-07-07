@@ -71,4 +71,31 @@ export class Property {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  name: string;
+
+  @Column('decimal', { precision: 12, scale: 2, nullable: true })
+  sellingPriceInclVat?: number;
+
+  @Column('decimal', { precision: 12, scale: 2, nullable: true })
+  landRegistrationFee?: number;
+
+  @Column('decimal', { precision: 12, scale: 2, nullable: true })
+  oqoodAmount?: number;
+
+  @Column('decimal', { precision: 12, scale: 2, nullable: true })
+  applicableFeesToDubaiLandDepartment?: number;
+
+  @Column({ nullable: true })
+  propertyUsage?: string;
+
+  @Column('decimal', { precision: 12, scale: 2, nullable: true })
+  plotAreaSqFt?: number;
+
+  @Column('json', { nullable: true })
+  amenities?: string[];
+
+  @Column('json', { nullable: true })
+  paymentPlan?: object[];
 } 

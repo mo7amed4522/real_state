@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { Company } from '../properties/entities/company.entity';
 import { CreateCompanyDto } from './dto/company.dto';
 import { UpdateCompanyDto } from './dto/company.dto';
+import { getFullLogoUrl } from './utils/file-upload.utils';
+import { promises as fsPromises } from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class CompaniesService {
@@ -47,5 +50,36 @@ export class CompaniesService {
     company.logoUrl = logoUrl;
     company.logoFileName = logoFileName;
     return this.companyRepository.save(company);
+  }
+
+  /**
+   * Test method to verify logo URL generation for a company
+   * @param companyId - The company ID to test
+   * @returns Object containing test information and generated URL
+   */
+  async testLogoUrl(companyId: string) {
+    const company = await this.findOne(companyId);
+    
+    if (!company.logoUrl) {
+      throw new NotFoundException('Company has no logo uploaded');
+    }
+
+    // Generate the expected URL structure
+    const expectedUrl = getFullLogoUrl(companyId, company.logoFileName);
+    
+    // Check if the file actually exists on disk
+    const filePath = join(process.cwd(), 'uploads', 'companies', companyId, company.logoFileName);
+    const fileExists = await fsPromises.access(filePath).then(() => true).catch(() => false);
+    
+    return {
+      companyId: companyId,
+      storedUrl: company.logoUrl,
+      expectedUrl: expectedUrl,
+      fileName: company.logoFileName,
+      fileExists: fileExists,
+      filePath: filePath,
+      urlsMatch: company.logoUrl === expectedUrl,
+      testResult: company.logoUrl === expectedUrl && fileExists ? 'PASS' : 'FAIL'
+    };
   }
 } 

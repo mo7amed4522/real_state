@@ -1,17 +1,12 @@
----
-description: 
-globs: 
-alwaysApply: true
----
 {
   "rules": [
     {
-      "name": "Use Django for Python-based microservices",
-      "description": "When generating Python code, use Django framework with REST Framework for building microservices.",
+      "name": "Use Go for backend microservices",
+      "description": "When generating backend code, use Go with idiomatic Go frameworks (Gin, Echo, Fiber) for building microservices.",
       "condition": {
-        "language": "python"
+        "language": "go"
       },
-      "prompt": "You are building a microservice in Django. Use best practices such as serializers, views, routers, and separate apps per service. Ensure RESTful design."
+      "prompt": "You are building a microservice in Go. Use idiomatic Go practices, routers, handlers, and modular structure. Ensure RESTful design."
     },
     {
       "name": "Use .NET Core for C# microservices",
@@ -29,10 +24,15 @@ alwaysApply: true
     {
       "name": "Add authentication and logging by default",
       "description": "Every service must include basic auth and logging scaffolding.",
-      "prompt": "Include JWT authentication and structured logging using Django logging or Serilog in .NET. Do not skip security basics."
+      "prompt": "Include JWT authentication and structured logging using Go logging libraries or Serilog in .NET. Do not skip security basics."
     },
     {
       "name": "Containerization readiness",
+      "description": "Generate Dockerfiles and docker-compose setup for each service.",
+      "prompt": "Each service should have a Dockerfile and a docker-compose.yml snippet for local development."
+    }
+  ]
+}
       "description": "Generate Dockerfiles and docker-compose setup for each service.",
       "prompt": "Each service should have a Dockerfile and a docker-compose.yml snippet for local development."
     }

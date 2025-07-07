@@ -15,9 +15,13 @@ export class RegisterUserDto {
   @IsString()
   lastName: string;
 
-  @IsOptional()
   @IsString()
-  phone?: string;
+  @Matches(/^\+[0-9]{1,4}$/, { message: 'Country code must start with + and contain digits only' })
+  countryCode: string;
+
+  @IsString()
+  @Matches(/^[0-9]{7,15}$/, { message: 'Phone number must be digits only and 7-15 digits' })
+  phoneNumber: string;
 
   @IsEnum(UserRole)
   role: UserRole;
@@ -42,7 +46,13 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  phone?: string;
+  @Matches(/^\+[0-9]{1,4}$/, { message: 'Country code must start with + and contain digits only' })
+  countryCode?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[0-9]{7,15}$/, { message: 'Phone number must be digits only and 7-15 digits' })
+  phoneNumber?: string;
 
   @IsOptional()
   @IsString()

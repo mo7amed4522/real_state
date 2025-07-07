@@ -17,5 +17,17 @@ export function generateEncryptedFileName(originalName: string): string {
 }
 
 export function getPublicFileUrl(companyId: string, fileName: string): string {
-  return `/uploads/companies/${companyId}/${fileName}`;
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  return `${baseUrl}/companies/logo/${companyId}/${fileName}`;
+}
+
+export function getFullLogoUrl(companyId: string, fileName: string): string {
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  return `${baseUrl}/companies/logo/${companyId}/${fileName}`;
+}
+
+// For backward compatibility - returns the old URL pattern
+export function getLegacyLogoUrl(companyId: string, fileName: string): string {
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  return `${baseUrl}/uploads/companies/${companyId}/${fileName}`;
 } 

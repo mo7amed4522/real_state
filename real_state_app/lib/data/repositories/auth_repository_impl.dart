@@ -24,10 +24,11 @@ class AuthRepositoryImpl implements AuthRepository {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(request.toJson()),
       );
+      debugPrint('response: ${response.statusCode}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final loginResponse = LoginResponse.fromJson(data);
-        debugPrint(loginResponse.user.status.toString());
+        debugPrint("active status: ${loginResponse.user.status.toString()}");
 
         await LocalStorage.saveToken(loginResponse.accessToken);
         return AuthResult(
@@ -59,7 +60,8 @@ class AuthRepositoryImpl implements AuthRepository {
         'Authorization': 'Bearer $token',
       },
     );
-    if (response.statusCode == 200) {
+    debugPrint('response getOwnProfile: ${response.statusCode}');
+    if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
       return GetOwnDataRequest.fromJson(data);
     } else {

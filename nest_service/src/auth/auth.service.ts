@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, DeepPartial, Like, ILike, MoreThan } from 'typeorm';
@@ -32,12 +32,34 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterUserDto) {
-    const { email, password, role, ...userData } = registerDto;
+  // Password validation helper
+  private validatePassword(password: string): void {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasDigit = /[0-9]/.test(password);
+    // Add special char check if needed: const hasSpecial = /[^A-Za-z0-9]/.test(password);
+    if (
+      password.length < minLength ||
+      !hasUpperCase ||
+      !hasLowerCase ||
+      !hasDigit
+    ) {
+      throw new BadRequestException(
+        'Password must be at least 8 characters long and include uppercase, lowercase, and a number.'
+      );
+    }
+  }
 
-    const existingUser = await this.userRepository.findOneBy({ email });
+  async register(registerDto: RegisterUserDto) {
+    const { email, password, role, countryCode, phoneNumber, ...userData } = registerDto;
+
+    // Validate password strength
+    this.validatePassword(password);
+
+    const existingUser = await this.userRepository.findOneBy([{ email }, { phoneNumber }]);
     if (existingUser) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('User with this email or phone number already exists');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -49,6 +71,8 @@ export class AuthService {
       role,
       status: UserStatus.PENDING_VERIFICATION,
       emailVerificationToken,
+      countryCode,
+      phoneNumber,
       ...userData,
     };
     
@@ -106,6 +130,13 @@ export class AuthService {
 
   async updateUser(userId: string, updateDto: UpdateUserDto) {
     const user = await this.findUserById(userId);
+    if (updateDto.phoneNumber) {
+      // Check uniqueness if phoneNumber is being updated
+      const existingUser = await this.userRepository.findOneBy({ phoneNumber: updateDto.phoneNumber });
+      if (existingUser && existingUser.id !== userId) {
+        throw new ConflictException('Phone number already in use');
+      }
+    }
     Object.assign(user, updateDto);
     return this.userRepository.save(user);
   }

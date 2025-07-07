@@ -133,4 +133,9 @@ export class PropertiesController {
     }
     return videos;
   }
+
+  @Get('by-company/:companyId')
+  findAllByCompany(@Param('companyId') companyId: string) {
+    return this.propertiesService.findAllByCompany(companyId);
+  }
 } 

@@ -35,9 +35,11 @@ export class User {
   @Column()
   lastName!: string;
 
-  @Column({ nullable: true })
-  @Index()
-  phone?: string;
+  @Column()
+  countryCode!: string;
+
+  @Column({ unique: true })
+  phoneNumber!: string;
 
   @Column({
     type: 'enum',

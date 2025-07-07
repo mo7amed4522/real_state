@@ -8,7 +8,7 @@
 ![Code Style](https://img.shields.io/badge/code%20style-prettier-ff69b4?style=for-the-badge)
 ![Contributors](https://img.shields.io/github/contributors/your-username/real_state?style=for-the-badge)
 ![Last Commit](https://img.shields.io/github/last-commit/your-username/real_state?style=for-the-badge)
-![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
 ![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -31,9 +31,9 @@
 
 - On push or PR, the following steps run:
   1. Checkout code and set up environment
-  2. Build Docker images for all services (Django, NestJS, .NET)
+  2. Build Docker images for all services (Go, NestJS, .NET)
   3. Install dependencies for each service
-  4. Run unit and integration tests for Django, NestJS, and .NET
+  4. Run unit and integration tests for Go, NestJS, and .NET
   5. Lint code for all services (e.g., flake8, eslint, dotnet format)
   6. Upload code coverage to Codecov
   7. Build and push Docker images to registry (if configured)
@@ -55,8 +55,8 @@ flowchart TD
     subgraph API_Gateway["NestJS (API Gateway)"]
       NEST[NestJS Service]
     end
-    subgraph RealTime["Django (Real-Time)"]
-      DJANGO[Django Service]
+    subgraph RealTime["Go (Real-Time)"]
+      GO[Go Service]
       REDIS[Redis]
     end
     subgraph Payments[".NET (Payments)"]
@@ -73,25 +73,25 @@ flowchart TD
       PGADMIN[pgAdmin]
     end
 
-    NEST -- REST/API Calls --> DJANGO
+    NEST -- REST/API Calls --> GO
     NEST -- REST/API Calls --> DOTNET
     NEST -- DB Queries --> POSTGRES
     NEST -- Events --> KAFKA
-    DJANGO -- WebSockets/Real-Time --> REDIS
-    DJANGO -- DB Queries --> POSTGRES
-    DJANGO -- Events --> KAFKA
+    GO -- WebSockets/Real-Time --> REDIS
+    GO -- DB Queries --> POSTGRES
+    GO -- Events --> KAFKA
     DOTNET -- Transactions --> POSTGRES
     DOTNET -- Distributed Lock --> REDLOCK
     DOTNET -- Events --> KAFKA
     KAFKA -- Event Stream --> NEST
-    KAFKA -- Event Stream --> DJANGO
+    KAFKA -- Event Stream --> GO
     KAFKA -- Event Stream --> DOTNET
     POSTGRES -- Admin UI --> PGADMIN
 ```
 
 ### Technical Details
-- **NestJS** acts as the API gateway, handling all client requests, aggregating data, and orchestrating calls to Django and .NET services.
-- **Django** provides real-time features (chat, notifications) using Channels and Redis for WebSocket support. It also listens to Kafka for real-time events and updates.
+- **NestJS** acts as the API gateway, handling all client requests, aggregating data, and orchestrating calls to Go and .NET services.
+- **Go** provides real-time features (chat, notifications) using WebSockets and Redis for pub/sub and real-time updates. It also listens to Kafka for real-time events and updates. (Framework: Gin/Echo/Fiber)
 - **.NET** handles all payment and transaction logic, using RedLock (distributed Redis lock) to ensure safe, atomic transactions. It emits events to Kafka for other services to react to payment changes.
 - **Kafka** is the backbone for real-time event streaming and inter-service communication. All services publish and subscribe to relevant topics for instant updates.
 - **PostgreSQL** is the main data store, accessed by all services for persistent data.
@@ -113,7 +113,7 @@ This architecture enables:
 This project is a modern, scalable **Microservices Architecture** for real estate platforms, designed for high performance, security, and real-time features.
 
 - **NestJS** acts as the main API gateway and orchestrator, handling REST API requests, authentication, and aggregating data from the database and other services.
-- **Django** is dedicated to real-time features, such as chat and notifications, leveraging Django Channels and Redis for WebSocket support and real-time database updates.
+- **Go** is dedicated to real-time features, such as chat and notifications, leveraging WebSockets and Redis for pub/sub and real-time database updates (using Gin/Echo/Fiber).
 - **.NET Core** is responsible for all payment and transaction logic, including Stripe, Google/Apple Pay, and advanced transaction safety. We use **RedLock** (distributed Redis lock) to ensure all financial transactions are atomic and safe across distributed systems.
 - **Kafka** is used for real-time event streaming and inter-service communication, ensuring that updates (like new messages, payments, or property changes) are instantly propagated across all services.
 
@@ -122,10 +122,10 @@ All services are containerized with Docker Compose for easy local development an
 ---
 
 ## ✨ Features
-- **Microservices architecture** (Django, NestJS, .NET)
+- **Microservices architecture** (Go, NestJS, .NET)
 - **Flutter mobile app** (with advanced state management and secure local chat storage)
 - **JWT authentication** and role-based access
-- **Real-time chat** with Django Channels and Redis
+- **Real-time chat** with WebSockets and Redis
 - **AI-powered property image/location analysis**
 - **Payment processing** (Stripe, Google/Apple Pay, RedLock, idempotency)
 - **File uploads** (images, videos, documents)
@@ -145,7 +145,7 @@ All services are containerized with Docker Compose for easy local development an
 
 ## 🏗️ Technology Stack
 
-- **Django** (Python, Channels, REST Framework) — Real-time chat, property management, AI features
+- **Go** (Gin/Echo/Fiber) — Real-time chat, property management, AI features
 - **NestJS** (Node.js, TypeScript) — Authentication, user management, REST APIs
 - **.NET Core** (C#) — Payment module, Stripe, Google/Apple Pay, RedLock, advanced logging
 - **Flutter** (Dart, `real_state_app/`) — Cross-platform mobile app using `flutter_bloc`, `equatable`, `go_router`, `json_serializable`, `flutter_localizations`, and `hive` for secure local chat and room storage
@@ -174,8 +174,6 @@ The `real_state_app/` directory contains a cross-platform Flutter application fo
 All services run in isolated containers and communicate via Docker Compose network:
 
 ```
-[ Django ]
-    |         \
 [ NestJS ] -- [ PostgreSQL ] -- [ pgAdmin ]
     |         /
 [ .NET  ]
@@ -212,16 +210,7 @@ REDIS_HOST=redis
 REDIS_PORT=6379
 ```
 
-#### django_service/.env
-```env
-DJANGO_SETTINGS_MODULE=django_project.settings
-DATABASE_URL=postgres://postgres:2521@db:5432/real-state
-SECRET_KEY=your_django_secret
-DEBUG=True
-ALLOWED_HOSTS=*
-REDIS_HOST=redis
-REDIS_PORT=6379
-```
+
 
 #### dotnet_service/.env
 ```env
@@ -237,21 +226,17 @@ Redis__Configuration=redis:6379
 docker-compose up -d --build
 ```
 
-- This will build and start all services: Django, NestJS, .NET, PostgreSQL, Redis, and pgAdmin.
+- This will build and start all services: NestJS, .NET, PostgreSQL, Redis, and pgAdmin.
 - Data is persisted in Docker volumes.
 
 ---
 
-### 4. **Apply Django Migrations**
-```sh
-docker-compose exec django_service python manage.py migrate
-```
+
 
 ---
 
-### 5. **Access the Services**
+### 4. **Access the Services**
 - **NestJS API:** http://localhost:3000
-- **Django API:** http://localhost:8000
 - **.NET API:** http://localhost:5000
 - **pgAdmin:** http://localhost:5050 (default: admin@example.com / admin)
 
@@ -259,7 +244,7 @@ docker-compose exec django_service python manage.py migrate
 
 ## 📦 Data & Features
 - **User authentication & JWT**
-- **Real-time chat (Django Channels, Redis)**
+- **Real-time chat (NestJS WebSockets, Redis)**
 - **Property management (CRUD, images, AI analysis)**
 - **Payment processing (Stripe, Google/Apple Pay, RedLock, idempotency)**
 - **File uploads**
@@ -276,7 +261,7 @@ docker-compose exec django_service python manage.py migrate
 ## 🖼️ Technology Logos
 
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg" height="40" alt="Django"/>
+
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nestjs/nestjs-plain.svg" height="40" alt="NestJS"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dot-net/dot-net-plain.svg" height="40" alt=".NET"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-plain.svg" height="40" alt="Flutter"/>
@@ -291,7 +276,7 @@ docker-compose exec django_service python manage.py migrate
 ## 📝 Notes
 - Make sure Docker Desktop is running.
 - If you change `.env` files, restart the affected service with `docker-compose restart <service>`.
-- For development, code changes in `django_service`, `nest_service`, and `dotnet_service` are hot-reloaded.
+- For development, code changes in `nest_service` and `dotnet_service` are hot-reloaded.
 
 ---
 
@@ -344,8 +329,7 @@ Please follow the existing code style and add tests where appropriate.
   - Delete `node_modules` and lock files, rebuild the Docker image
 - **.NET/Redis connection issues?**
   - Make sure Redis is running and the connection string uses `redis:6379`
-- **Django/Postgres version errors?**
-  - Ensure you are using Postgres 14+ as required by Django
+
 
 If you encounter issues not listed here, please open an issue with logs and steps to reproduce.
 

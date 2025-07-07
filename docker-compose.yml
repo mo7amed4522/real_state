@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   nest_service:
@@ -26,16 +26,18 @@ services:
       - db
       - redis
 
-  django_service:
-    build: ./django_service
+  go_chat_service:
+    build: ./go_chat_service
     ports:
-      - "8000:8000"
-    volumes:
-      - ./django_service:/usr/src/app
+      - "8081:8081"
     env_file:
-      - ./django_service/.env
+      - ./go_chat_service/config.env
     depends_on:
       - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+
 
   db:
     image: postgres:14
@@ -64,4 +66,4 @@ services:
       - db
 
 volumes:
-  postgres_data: 
+  postgres_data:

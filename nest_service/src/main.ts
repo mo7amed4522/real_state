@@ -19,6 +19,15 @@ async function bootstrap() {
   console.log('Current working directory:', process.cwd());
   app.use('/uploads', express.static(uploadsPath));
   
-  await app.listen(process.env.PORT ?? 3000);
+  // Add a simple test route to verify the application is working
+  app.use('/test', (req, res) => {
+    res.json({ message: 'Test route working', timestamp: new Date().toISOString() });
+  });
+  
+  const port = process.env.PORT ?? 3000;
+  console.log(`Application starting on port ${port}`);
+  
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();

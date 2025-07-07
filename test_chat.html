@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    		<title>Chat Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .chat-area {
+            border: 1px solid #ddd;
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fafafa;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 4px;
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .message.sent {
+            background-color: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+        .message.received {
+            background-color: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        input, button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input {
+            flex: 1;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        			<h1>Chat WebSocket Test</h1>
+        
+        <div class="controls">
+            <h3>Connection Settings</h3>
+            <div class="input-group">
+                <input type="text" id="roomId" placeholder="Room ID (UUID)" value="">
+                <button onclick="generateRoomId()">Generate Room ID</button>
+            </div>
+            <div class="input-group">
+                <input type="number" id="senderId" placeholder="Sender ID" value="1">
+                <button onclick="connect()" id="connectBtn">Connect</button>
+                <button onclick="disconnect()" id="disconnectBtn" disabled>Disconnect</button>
+            </div>
+        </div>
+
+        <div id="status" class="status disconnected">
+            Disconnected
+        </div>
+
+        <div class="chat-area" id="chatArea">
+            				<div class="message">Welcome to Chat Test! Connect to start chatting.</div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="messageInput" placeholder="Type your message..." disabled>
+            <button onclick="sendMessage()" id="sendBtn" disabled>Send</button>
+        </div>
+
+        <div class="controls">
+            <h3>Test Controls</h3>
+            <button onclick="sendTestMessage()" id="testBtn" disabled>Send Test Message</button>
+            <button onclick="sendReadReceipt()" id="readBtn" disabled>Send Read Receipt</button>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let isConnected = false;
+
+        // Generate a random room ID
+        function generateRoomId() {
+            const roomId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            document.getElementById('roomId').value = roomId;
+        }
+
+        // Generate room ID on page load
+        window.onload = function() {
+            generateRoomId();
+        };
+
+        function updateStatus(message, isConnected) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${isConnected ? 'connected' : 'disconnected'}`;
+        }
+
+        function addMessage(content, type = 'info') {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = content;
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function connect() {
+            const roomId = document.getElementById('roomId').value;
+            const senderId = document.getElementById('senderId').value;
+            
+            if (!roomId) {
+                alert('Please enter a room ID');
+                return;
+            }
+
+            const wsUrl = `ws://localhost:8000/ws/chat/${roomId}/`;
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    isConnected = true;
+                    updateStatus('Connected to WebSocket', true);
+                    addMessage('Connected to chat room: ' + roomId, 'sent');
+                    
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                    document.getElementById('messageInput').disabled = false;
+                    document.getElementById('sendBtn').disabled = false;
+                    document.getElementById('testBtn').disabled = false;
+                    document.getElementById('readBtn').disabled = false;
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    addMessage(`Received: ${JSON.stringify(data)}`, 'received');
+                };
+                
+                ws.onclose = function() {
+                    isConnected = false;
+                    updateStatus('Disconnected from WebSocket', false);
+                    addMessage('Disconnected from chat room', 'info');
+                    
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    document.getElementById('messageInput').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                    document.getElementById('testBtn').disabled = true;
+                    document.getElementById('readBtn').disabled = true;
+                };
+                
+                ws.onerror = function(error) {
+                    addMessage('WebSocket error: ' + error, 'info');
+                };
+                
+            } catch (error) {
+                addMessage('Connection error: ' + error.message, 'info');
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        function sendMessage() {
+            if (!isConnected) return;
+            
+            const messageInput = document.getElementById('messageInput');
+            const senderId = document.getElementById('senderId').value;
+            const content = messageInput.value.trim();
+            
+            if (!content) return;
+            
+            const message = {
+                sender_id: parseInt(senderId),
+                content: content
+            };
+            
+            ws.send(JSON.stringify(message));
+            addMessage(`Sent: ${content}`, 'sent');
+            messageInput.value = '';
+        }
+
+        function sendTestMessage() {
+            if (!isConnected) return;
+            
+            const senderId = document.getElementById('senderId').value;
+            const testMessage = {
+                sender_id: parseInt(senderId),
+                content: 'This is a test message from the web client!'
+            };
+            
+            ws.send(JSON.stringify(testMessage));
+            addMessage(`Sent test message: ${testMessage.content}`, 'sent');
+        }
+
+        function sendReadReceipt() {
+            if (!isConnected) return;
+            
+            const readMessage = {
+                type: 'read',
+                message_id: 1
+            };
+            
+            ws.send(JSON.stringify(readMessage));
+            addMessage(`Sent read receipt for message ID: ${readMessage.message_id}`, 'sent');
+        }
+
+        // Allow Enter key to send message
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 

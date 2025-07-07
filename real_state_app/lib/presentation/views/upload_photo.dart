@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
-import 'package:real_state_app/presentation/blocs/upload_photo_bloc.dart';
+import 'package:real_state_app/presentation/bloc/upload_photo_bloc.dart';
 import 'package:real_state_app/presentation/widgets/animated_photo.dart';
 
 class UploadPhotoScreen extends StatelessWidget {
@@ -138,7 +139,7 @@ class UploadPhotoScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             CupertinoButton(
-                              onPressed: () => Navigator.of(context).maybePop(),
+                              onPressed: () => context.push('/home'),
                               child: const Text('Skip'),
                             ),
                           ],

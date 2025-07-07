@@ -9,7 +9,8 @@ class GetOwnDataRequest {
   final String passwordHash;
   final String firstName;
   final String lastName;
-  final String phone;
+  final String countryCode;
+  final String phoneNumber;
   final String role;
   final String status;
   final String? avatarUrl;
@@ -29,7 +30,8 @@ class GetOwnDataRequest {
     required this.passwordHash,
     required this.firstName,
     required this.lastName,
-    required this.phone,
+    required this.countryCode,
+    required this.phoneNumber,
     required this.role,
     required this.status,
     this.avatarUrl,

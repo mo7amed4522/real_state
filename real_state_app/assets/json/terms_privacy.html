@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Use & Privacy Policy</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    :root {
+      --primary: #0a6cff;
+      --bg-light: #f7f9fa;
+      --bg-dark: #181a1b;
+      --text-light: #222;
+      --text-dark: #f7f9fa;
+      --container-bg-light: #fff;
+      --container-bg-dark: #23272b;
+      --feature-bg-light: #eaf6ff;
+      --feature-bg-dark: #22334a;
+      --contact-bg-light: #f0f6ff;
+      --contact-bg-dark: #1a2636;
+      --footer-light: #888;
+      --footer-dark: #bbb;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+      transition: background 0.4s, color 0.4s;
+    }
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: var(--container-bg-light);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      padding: 32px 24px 24px 24px;
+      transition: background 0.4s;
+    }
+    body.dark-mode .container {
+      background: var(--container-bg-dark);
+    }
+    h1, h2, h3 {
+      color: var(--primary);
+      margin-top: 0;
+    }
+    h1 {
+      font-size: 2.3rem;
+      margin-bottom: 0.5em;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-app {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(10,108,255,0.13);
+      object-fit: cover;
+      background: #fff;
+    }
+    h2 {
+      font-size: 1.4rem;
+      margin-top: 2em;
+      margin-bottom: 0.5em;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s;
+    }
+    h2 .arrow {
+      margin-right: 4px;
+      font-size: 1.1em;
+      transition: transform 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    ul, ol {
+      margin-left: 1.5em;
+    }
+    .contact {
+      background: var(--contact-bg-light);
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      margin-top: 2em;
+      border-radius: 8px;
+      transition: background 0.4s;
+    }
+    body.dark-mode .contact {
+      background: var(--contact-bg-dark);
+    }
+    .footer {
+      text-align: center;
+      color: var(--footer-light);
+      font-size: 0.95em;
+      margin-top: 2em;
+      transition: color 0.4s;
+    }
+    body.dark-mode .footer {
+      color: var(--footer-dark);
+    }
+    .feature {
+      background: var(--feature-bg-light);
+      border-radius: 12px;
+      padding: 14px 22px;
+      margin-bottom: 1em;
+      border-left: 4px solid var(--primary);
+      box-shadow: 0 2px 8px rgba(10,108,255,0.07);
+      transition: background 0.4s;
+    }
+    body.dark-mode .feature {
+      background: var(--feature-bg-dark);
+    }
+    .highlight {
+      color: var(--primary);
+      font-weight: bold;
+    }
+    .collapsible-content {
+      display: none;
+      animation: fadeIn 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+      will-change: opacity, max-height;
+      overflow: hidden;
+    }
+    .collapsible-content.open {
+      display: block;
+      animation: fadeInUp 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #backToTop {
+      display: none;
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 100;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.7em;
+      box-shadow: 0 2px 8px rgba(10,108,255,0.15);
+      cursor: pointer;
+      transition: background 0.2s;
+      animation: bounceIn 0.7s;
+    }
+    #backToTop:hover {
+      background: #084a9e;
+      animation: pulse 0.7s;
+    }
+    .theme-toggle {
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      z-index: 200;
+      background: var(--container-bg-light);
+      color: var(--primary);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      box-shadow: 0 2px 8px rgba(10,108,255,0.13);
+      cursor: pointer;
+      font-size: 1.3em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.4s, color 0.4s;
+    }
+    body.dark-mode .theme-toggle {
+      background: var(--container-bg-dark);
+      color: #ffd700;
+    }
+    /* Responsive improvements for mobile */
+    @media (max-width: 600px) {
+      .container {
+        padding: 10px 2px;
+        margin: 10px 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(10,108,255,0.07);
+      }
+      h1 {
+        font-size: 1.2rem;
+        gap: 8px;
+      }
+      .logo-app {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+      }
+      h2 {
+        font-size: 1.05rem;
+        gap: 4px;
+      }
+      .feature {
+        padding: 10px 8px;
+        font-size: 0.98em;
+        border-radius: 7px;
+      }
+      .contact {
+        padding: 10px 6px;
+        font-size: 0.98em;
+        border-radius: 7px;
+      }
+      .footer {
+        font-size: 0.85em;
+      }
+      #backToTop {
+        right: 8px;
+        bottom: 8px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.1em;
+      }
+      .theme-toggle {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        font-size: 1em;
+      }
+    }
+    @media (max-width: 400px) {
+      .container {
+        padding: 4px 0;
+      }
+      h1 {
+        font-size: 1rem;
+      }
+      h2 {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+    <span id="themeIcon">🌙</span>
+  </button>
+  <div class="container shadow-lg animate__animated animate__fadeInDown">
+    <h1><img src="../images/logo-app.png" alt="App Logo" class="logo-app animate__animated animate__pulse animate__infinite"/>Terms of Use & Privacy Policy</h1>
+    <p class="animate__animated animate__fadeInUp">Welcome to our Real Estate App! Please read these terms and our privacy policy carefully before using the application.</p>
+
+    <h2 id="how-to-use"><span class="arrow">&#9654;</span>How to Use the App</h2>
+    <div class="collapsible-content" id="how-to-use-content">
+      <div class="feature">
+        <span class="highlight">Property Showcase:</span> Browse and view properties in a modern, user-friendly interface. Explore details, images, and features of each property.
+      </div>
+      <div class="feature">
+        <span class="highlight">Contact & Chat:</span> If you are interested in buying or renting, you can contact the company directly or chat with the property developer. Our secure chat feature is built for your convenience.
+      </div>
+      <div class="feature">
+        <span class="highlight">Wallet & Payments:</span> Your personal wallet tracks all amounts due. We create tasks for your payments and notify you monthly about new dues. All transactions are transparent and secure.
+      </div>
+      <div class="feature">
+        <span class="highlight">PDF Receipts:</span> Download PDF receipts for all your payments and transactions, ensuring you have proof of ownership and payment history.
+      </div>
+      <div class="feature">
+        <span class="highlight">Customer Service:</span> Our support team is available 24/7. Contact us anytime for help or questions.
+      </div>
+    </div>
+
+    <h2 id="legal-rights"><span class="arrow">&#9654;</span>Legal & User Rights</h2>
+    <div class="collapsible-content" id="legal-rights-content">
+      <ul>
+        <li>All activities and transactions are governed by the laws and policies of the United Arab Emirates (Emirates).</li>
+        <li>You have full rights regarding your money and property transfers. If any issue arises, your rights are protected under UAE law.</li>
+        <li>All chats and transactions are securely stored and handled with strict confidentiality.</li>
+        <li>By using this app, you agree to comply with all applicable laws and our terms of service.</li>
+      </ul>
+    </div>
+
+    <h2 id="privacy-policy"><span class="arrow">&#9654;</span>Privacy Policy</h2>
+    <div class="collapsible-content" id="privacy-policy-content">
+      <ul>
+        <li>We use secure local storage (Hive) to keep your chat data and room information private and safe on your device.</li>
+        <li>Personal and financial information is never shared with third parties without your consent.</li>
+        <li>All sensitive data is protected using industry-standard encryption and security practices.</li>
+        <li>We use .env files to secure all important credentials and secrets in our backend and mobile app.</li>
+      </ul>
+    </div>
+
+    <h2 id="developer-contact"><span class="arrow">&#9654;</span>Developer & Contact</h2>
+    <div class="collapsible-content" id="developer-contact-content">
+      <div class="contact">
+        <strong>Developer:</strong> Khaled Mohamed Abdoui<br>
+        <strong>WhatsApp:</strong> <a href="https://wa.me/971525374187" target="_blank">+971 052 537 4187</a><br>
+        <strong>Email:</strong> <a href="mailto:eng.khaled4522@gmail.com">eng.khaled4522@gmail.com</a><br>
+        <strong>Suggestions or Issues?</strong> Call, text, or email anytime!
+      </div>
+    </div>
+
+    <div class="footer">
+      &copy; 2024 Real Estate App. All rights reserved.<br>
+      Powered by Khaled Mohamed Abdoui.
+    </div>
+  </div>
+  <button id="backToTop" title="Back to Top" class="animate__animated animate__bounceIn">&#8679;</button>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Collapsible sections with animation
+    document.querySelectorAll('h2').forEach(function(h2) {
+      h2.addEventListener('click', function() {
+        var id = h2.id + '-content';
+        var content = document.getElementById(id);
+        var arrow = h2.querySelector('.arrow');
+        if (content) {
+          var isOpen = content.classList.toggle('open');
+          if (isOpen) {
+            content.classList.add('animate__animated', 'animate__fadeInUp');
+            setTimeout(() => content.classList.remove('animate__fadeInUp'), 800);
+          }
+          arrow.style.transform = isOpen ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+      });
+    });
+    // Open the first section by default
+    document.getElementById('how-to-use-content').classList.add('open');
+    document.querySelector('#how-to-use .arrow').style.transform = 'rotate(90deg)';
+
+    // Back to Top button
+    var backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 200) {
+        backToTop.style.display = 'block';
+        backToTop.classList.add('animate__bounceIn');
+      } else {
+        backToTop.style.display = 'none';
+        backToTop.classList.remove('animate__bounceIn');
+      }
+    });
+    backToTop.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Theme toggle (dark/light mode)
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    function setTheme(dark) {
+      if (dark) {
+        document.body.classList.add('dark-mode');
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+    // Detect system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    setTheme(savedTheme === 'dark' || (!savedTheme && prefersDark));
+    themeToggle.addEventListener('click', function() {
+      setTheme(!document.body.classList.contains('dark-mode'));
+    });
+  </script>
+</body>
+</html> 
