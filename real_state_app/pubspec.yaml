@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: '>=2.17.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -57,7 +57,22 @@ dependencies:
   lottie: ^3.3.1
   http: ^1.4.0
   web_socket_channel: ^2.4.0
+  emoji_picker_flutter: ^1.6.1
+  file_picker: ^10.2.0
+  just_audio: ^0.9.36
+  permission_handler: ^11.3.1
+  url_launcher: ^6.2.6
+  open_file: ^3.3.2
+  record: ^6.0.0
+  path_provider: ^2.1.5
+  image: ^4.5.4
+  archive: ^4.0.7
+  scrollable_positioned_list: ^0.3.8
+  cached_network_image: ^3.4.1
+  audio_waveforms: ^1.3.0
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   build_runner: ^2.4.8
   flutter_test:
     sdk: flutter
@@ -85,7 +100,7 @@ flutter:
   fonts:
     - family: SFProDisplay
       fonts:
-        - asset: assets/fonts/SFPRODISPLAYREGULAR.OTF
+        - asset: assets/fonts/SFPRODISPLAYREGULAR.otf
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

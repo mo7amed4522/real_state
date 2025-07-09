@@ -48,6 +48,14 @@ class CreateConversationEvent extends ChatEvent {
   List<Object?> get props => [currentUserId, selectedUserId];
 }
 
+class FilterUsers extends ChatEvent {
+  final String query;
+  final String currentUserId;
+  const FilterUsers(this.query, this.currentUserId);
+  @override
+  List<Object?> get props => [query, currentUserId];
+}
+
 //. ======================. STATE ================ //
 abstract class ChatState extends Equatable {
   const ChatState();
@@ -65,28 +73,33 @@ class ChatLoaded extends ChatState {
   final List<ChatUser> allUsers;
   final Map<String, bool> onlineStatus;
   final Map<String, DateTime?> lastSeen;
+  final List<ChatUser> filteredUsers;
 
   const ChatLoaded({
     required this.conversations,
     required this.allUsers,
     required this.onlineStatus,
     required this.lastSeen,
+    this.filteredUsers = const [],
   });
 
   @override
-  List<Object?> get props => [conversations, allUsers, onlineStatus, lastSeen];
+  List<Object?> get props =>
+      [conversations, allUsers, onlineStatus, lastSeen, filteredUsers];
 
   ChatLoaded copyWith({
     List<ChatConversation>? conversations,
     List<ChatUser>? allUsers,
     Map<String, bool>? onlineStatus,
     Map<String, DateTime?>? lastSeen,
+    List<ChatUser>? filteredUsers,
   }) {
     return ChatLoaded(
       conversations: conversations ?? this.conversations,
       allUsers: allUsers ?? this.allUsers,
       onlineStatus: onlineStatus ?? this.onlineStatus,
       lastSeen: lastSeen ?? this.lastSeen,
+      filteredUsers: filteredUsers ?? this.filteredUsers,
     );
   }
 }
@@ -109,6 +122,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<NewMessageReceived>(_onNewMessageReceived);
     on<OnlineStatusUpdated>(_onOnlineStatusUpdated);
     on<CreateConversationEvent>(_onCreateConversation);
+    on<FilterUsers>(_onFilterUsers);
   }
 
   Future<void> _onLoadChatData(
@@ -201,6 +215,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       } catch (e) {
         emit(ChatError(e.toString()));
       }
+    }
+  }
+
+  void _onFilterUsers(FilterUsers event, Emitter<ChatState> emit) {
+    if (state is ChatLoaded) {
+      final currentState = state as ChatLoaded;
+      final filtered = currentState.allUsers
+          .where((user) =>
+              user.id != event.currentUserId &&
+              user.fullName.toLowerCase().contains(event.query.toLowerCase()))
+          .toList();
+      emit(currentState.copyWith(filteredUsers: filtered));
     }
   }
 }

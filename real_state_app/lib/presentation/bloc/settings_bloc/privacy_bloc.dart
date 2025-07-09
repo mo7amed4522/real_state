@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 // Events
 abstract class PrivacyEvent extends Equatable {
@@ -40,10 +41,8 @@ class PrivacyBloc extends Bloc<PrivacyEvent, PrivacyState> {
     on<LoadPrivacyHtml>((event, emit) async {
       emit(PrivacyLoading());
       try {
-        // Simulate loading from local asset
-        await Future.delayed(const Duration(milliseconds: 300));
-        // The actual loading will be in the UI using rootBundle
-        emit(PrivacyLoaded(AppAssets.termsPrivacy));
+        final html = await rootBundle.loadString(AppAssets.termsPrivacy);
+        emit(PrivacyLoaded(html));
       } catch (e) {
         emit(PrivacyError(e.toString()));
       }

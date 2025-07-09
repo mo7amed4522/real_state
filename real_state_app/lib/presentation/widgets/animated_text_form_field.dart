@@ -1,9 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/animated_text_form_field_bloc.dart';
 
-class AnimatedTextFormField extends ConsumerStatefulWidget {
+class AnimatedTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
   final IconData icon;
@@ -36,103 +37,91 @@ class AnimatedTextFormField extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<AnimatedTextFormField> createState() =>
-      _AnimatedTextFormFieldState();
-}
-
-class _AnimatedTextFormFieldState extends ConsumerState<AnimatedTextFormField> {
-  late FocusNode _focusNode;
-  String? _errorText;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode = FocusNode();
-    _focusNode.addListener(_handleFocusChange);
-  }
-
-  void _handleFocusChange() {
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(_handleFocusChange);
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final isPassword = widget.isPasswordField ?? false;
-    return TextFormField(
-      controller: widget.controller,
-      focusNode: _focusNode,
-      obscureText: isPassword
-          ? !(widget.passwordVisible ?? false)
-          : widget.obscureText,
-      style: theme.textTheme.bodyLarge?.copyWith(
-        color: isDark
-            ? theme.colorScheme.onSurface
-            : theme.colorScheme.onBackground,
+    return BlocProvider<AnimatedTextFormFieldBloc>(
+      create: (_) => AnimatedTextFormFieldBloc(
+        isPasswordField: isPasswordField ?? false,
+        passwordVisible: passwordVisible ?? false,
       ),
-      keyboardType: widget.keyboardType,
-      enabled: widget.enabled,
-      decoration: InputDecoration(
-        prefixIcon: Icon(
-          widget.icon,
-          color: isDark ? theme.colorScheme.outline : theme.colorScheme.primary,
-        ),
-        labelText: widget.labelText,
-        labelStyle: TextStyle(
-          color: _focusNode.hasFocus || widget.controller.text.isNotEmpty
-              ? theme.colorScheme.primary
-              : (isDark
-                    ? theme.colorScheme.onSurface.withOpacity(0.7)
-                    : theme.colorScheme.onBackground.withOpacity(0.7)),
-        ),
-        floatingLabelStyle: TextStyle(color: theme.colorScheme.primary),
-        hintText: widget.hintText,
-        hintStyle: TextStyle(
-          color: isDark
-              ? theme.colorScheme.onSurface.withOpacity(0.5)
-              : theme.colorScheme.onBackground.withOpacity(0.5),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 14,
-        ),
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(
-                  (widget.passwordVisible ?? false)
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: isDark
-                      ? theme.colorScheme.outline
-                      : theme.colorScheme.primary,
-                ),
-                onPressed: widget.onTogglePasswordVisibility,
-              )
-            : widget.suffix,
-        errorText: _errorText,
-        filled: true,
-        fillColor: isDark ? theme.colorScheme.surface : Colors.white,
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      child: BlocBuilder<AnimatedTextFormFieldBloc, AnimatedTextFormFieldState>(
+        builder: (context, state) {
+          final theme = Theme.of(context);
+          final isDark = theme.brightness == Brightness.dark;
+          final bloc = context.read<AnimatedTextFormFieldBloc>();
+          return TextFormField(
+            controller: controller,
+            obscureText:
+                state.isPasswordField ? !state.passwordVisible : obscureText,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: isDark
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.onBackground,
+            ),
+            keyboardType: keyboardType,
+            enabled: enabled,
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                icon,
+                color: isDark
+                    ? theme.colorScheme.outline
+                    : theme.colorScheme.primary,
+              ),
+              labelText: labelText,
+              labelStyle: TextStyle(
+                color: controller.text.isNotEmpty || state.text.isNotEmpty
+                    ? theme.colorScheme.primary
+                    : (isDark
+                        ? theme.colorScheme.onSurface.withOpacity(0.7)
+                        : theme.colorScheme.onBackground.withOpacity(0.7)),
+              ),
+              floatingLabelStyle: TextStyle(color: theme.colorScheme.primary),
+              hintText: hintText,
+              hintStyle: TextStyle(
+                color: isDark
+                    ? theme.colorScheme.onSurface.withOpacity(0.5)
+                    : theme.colorScheme.onBackground.withOpacity(0.5),
+              ),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 14,
+              ),
+              suffixIcon: state.isPasswordField
+                  ? IconButton(
+                      icon: Icon(
+                        state.passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: isDark
+                            ? theme.colorScheme.outline
+                            : theme.colorScheme.primary,
+                      ),
+                      onPressed: () {
+                        bloc.add(AnimatedTogglePasswordVisibility());
+                        onTogglePasswordVisibility?.call();
+                      },
+                    )
+                  : suffix,
+              errorText: state.errorText,
+              filled: true,
+              fillColor: isDark ? theme.colorScheme.surface : Colors.white,
+              floatingLabelBehavior: FloatingLabelBehavior.auto,
+            ),
+            validator: (value) {
+              bloc.add(AnimatedTextValidate(value ?? '', validator));
+              return state.errorText;
+            },
+            onChanged: (value) {
+              bloc.add(AnimatedTextChanged(value));
+              if (validator != null) {
+                bloc.add(AnimatedTextValidate(value, validator));
+              }
+              onChanged?.call(value);
+            },
+          );
+        },
       ),
-      validator: (value) {
-        final error = widget.validator?.call(value);
-        setState(() => _errorText = error);
-        return error;
-      },
-      onChanged: (value) {
-        final error = widget.validator?.call(value);
-        setState(() => _errorText = error);
-        widget.onChanged?.call(value);
-      },
     );
   }
 }

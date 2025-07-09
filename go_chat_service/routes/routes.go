@@ -36,6 +36,8 @@ func SetupRoutes(chatHandler *handlers.ChatHandler, userHandler *handlers.UserHa
 			chat.POST("/messages", chatHandler.SendMessage)
 			chat.PUT("/conversations/:conversation_id/read", chatHandler.MarkConversationAsRead)
 			chat.GET("/users/:user_id/unread-count", chatHandler.GetUnreadMessageCount)
+			chat.POST("/conversations/:conversation_id/upload", chatHandler.UploadFile)
+			chat.GET("/conversations/:conversation_id/files/:filename", chatHandler.DownloadFileFromRedis)
 		}
 
 		// User routes

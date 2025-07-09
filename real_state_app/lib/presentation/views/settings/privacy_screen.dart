@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:real_state_app/core/assets/app_assets.dart';
 import '../../bloc/settings_bloc/privacy_bloc.dart';
 
 class PrivacyScreen extends StatelessWidget {
@@ -29,7 +27,6 @@ class _PrivacyView extends StatefulWidget {
 }
 
 class _PrivacyViewState extends State<_PrivacyView> {
-  String? _htmlContent;
   late final WebViewController _controller;
 
   @override
@@ -37,15 +34,6 @@ class _PrivacyViewState extends State<_PrivacyView> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
-    _loadHtml();
-  }
-
-  Future<void> _loadHtml() async {
-    final html = await rootBundle.loadString(AppAssets.termsPrivacy);
-    setState(() {
-      _htmlContent = html;
-    });
-    _controller.loadHtmlString(html);
   }
 
   @override
@@ -90,9 +78,18 @@ class _PrivacyViewState extends State<_PrivacyView> {
   }
 
   Widget _buildWebView() {
-    if (_htmlContent == null) {
-      return const Center(child: CupertinoActivityIndicator());
-    }
-    return WebViewWidget(controller: _controller);
+    return BlocBuilder<PrivacyBloc, PrivacyState>(
+      builder: (context, state) {
+        if (state is PrivacyLoading || state is PrivacyInitial) {
+          return const Center(child: CupertinoActivityIndicator());
+        } else if (state is PrivacyError) {
+          return Center(child: Text('Error: ${state.message}'));
+        } else if (state is PrivacyLoaded) {
+          _controller.loadHtmlString(state.html);
+          return WebViewWidget(controller: _controller);
+        }
+        return const SizedBox.shrink();
+      },
+    );
   }
 }

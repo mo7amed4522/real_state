@@ -1,10 +1,16 @@
 package websocket
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
+	"time"
+
+	"go-chat-service/database"
+	"go-chat-service/models"
+	"go-chat-service/services"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -20,11 +26,12 @@ type Client struct {
 }
 
 type Hub struct {
-	clients    map[uuid.UUID]*Client
-	broadcast  chan []byte
-	register   chan *Client
-	unregister chan *Client
-	mu         sync.RWMutex
+	clients     map[uuid.UUID]*Client
+	broadcast   chan []byte
+	register    chan *Client
+	unregister  chan *Client
+	mu          sync.RWMutex
+	ChatService *services.ChatService
 }
 
 type Message struct {
@@ -60,12 +67,13 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func NewHub() *Hub {
+func NewHub(chatService *services.ChatService) *Hub {
 	return &Hub{
-		clients:    make(map[uuid.UUID]*Client),
-		broadcast:  make(chan []byte),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
+		clients:     make(map[uuid.UUID]*Client),
+		broadcast:   make(chan []byte),
+		register:    make(chan *Client),
+		unregister:  make(chan *Client),
+		ChatService: chatService,
 	}
 }
 
@@ -125,10 +133,44 @@ func (c *Client) readPump() {
 		// Process message based on type
 		switch msg.Type {
 		case "chat_message":
-			// Broadcast to all clients
-			c.Hub.broadcast <- message
+			// Parse the incoming data
+			var chatMsg ChatMessage
+			dataBytes, _ := json.Marshal(msg.Data)
+			if err := json.Unmarshal(dataBytes, &chatMsg); err != nil {
+				log.Printf("error unmarshaling chat message: %v", err)
+				continue
+			}
+
+			// Save to PostgreSQL
+			savedMsg, err := c.Hub.ChatService.SendMessage(
+				chatMsg.ConversationID,
+				chatMsg.SenderID,
+				chatMsg.Content,
+				models.MessageType(chatMsg.MessageType),
+			)
+			if err != nil {
+				log.Printf("error saving chat message to DB: %v", err)
+				continue
+			}
+
+			// Save to Redis (as JSON in a list per conversation)
+			redisKey := "chat:messages:" + savedMsg.ConversationID.String()
+			msgJson, _ := json.Marshal(savedMsg)
+			err = database.RedisClient.RPush(context.Background(), redisKey, msgJson).Err()
+			if err != nil {
+				log.Printf("error saving chat message to Redis: %v", err)
+			}
+
+			// Prepare the message to broadcast (with DB fields)
+			outMsg := Message{
+				Type:      "chat_message",
+				Data:      savedMsg,
+				UserID:    chatMsg.SenderID,
+				Timestamp: time.Now().Unix(),
+			}
+			outBytes, _ := json.Marshal(outMsg)
+			c.Hub.broadcast <- outBytes
 		case "typing":
-			// Broadcast typing indicator
 			c.Hub.broadcast <- message
 		}
 	}

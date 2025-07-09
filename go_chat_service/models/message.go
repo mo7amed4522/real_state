@@ -13,6 +13,8 @@ const (
 	MessageTypeText  MessageType = "text"
 	MessageTypeImage MessageType = "image"
 	MessageTypeFile  MessageType = "file"
+	MessageTypeVoice MessageType = "voice"
+	MessageTypeEmoji MessageType = "emoji"
 )
 
 type Message struct {

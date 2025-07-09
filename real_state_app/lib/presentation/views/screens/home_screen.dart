@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:real_state_app/core/assets/app_assets.dart';
 import 'package:real_state_app/data/models/properties_model.dart';
 import 'package:real_state_app/domain/usecases/companies_usecase.dart';

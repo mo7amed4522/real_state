@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:real_state_app/core/theme/app_theme.dart';
 import 'package:real_state_app/data/models/chat_models.dart';
 import 'package:real_state_app/data/services/chat_service.dart';
-import 'package:real_state_app/presentation/bloc/conversation_bloc.dart';
 import 'package:real_state_app/presentation/bloc/screens/chat_widget_bloc.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -23,9 +22,8 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          ChatBloc(chatService: ChatService())
-            ..add(LoadChatData(currentUserId)),
+      create: (context) => ChatBloc(chatService: ChatService())
+        ..add(LoadChatData(currentUserId)),
       child: _ChatScreenView(currentUserId: currentUserId),
     );
   }
@@ -265,8 +263,9 @@ class _ChatScreenView extends StatelessWidget {
                           currentUserId: currentUserId,
                           onUserSelected: (user) {
                             context.read<ChatBloc>().add(
-                              CreateConversationEvent(currentUserId, user.id),
-                            );
+                                  CreateConversationEvent(
+                                      currentUserId, user.id),
+                                );
                             Navigator.pop(context);
                           },
                         ),
@@ -310,8 +309,9 @@ class _ChatScreenView extends StatelessWidget {
                             currentUserId: currentUserId,
                             onUserSelected: (user) {
                               context.read<ChatBloc>().add(
-                                CreateConversationEvent(currentUserId, user.id),
-                              );
+                                    CreateConversationEvent(
+                                        currentUserId, user.id),
+                                  );
                               Navigator.pop(context);
                             },
                           ),
@@ -350,11 +350,11 @@ class _ChatScreenView extends StatelessWidget {
                               currentUserId: currentUserId,
                               onUserSelected: (user) {
                                 context.read<ChatBloc>().add(
-                                  CreateConversationEvent(
-                                    currentUserId,
-                                    user.id,
-                                  ),
-                                );
+                                      CreateConversationEvent(
+                                        currentUserId,
+                                        user.id,
+                                      ),
+                                    );
                                 Navigator.pop(context);
                               },
                             ),
@@ -398,388 +398,146 @@ class _NewChatDialog extends StatefulWidget {
 }
 
 class _NewChatDialogState extends State<_NewChatDialog> {
-  List<ChatUser> _filteredUsers = [];
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _filteredUsers = widget.allUsers
-        .where((user) => user.id != widget.currentUserId)
-        .toList();
+    // Initialize with all users except current
+    context.read<ChatBloc>().add(FilterUsers('', widget.currentUserId));
   }
 
   void _filterUsers(String query) {
-    setState(() {
-      _filteredUsers = widget.allUsers
-          .where(
-            (user) =>
-                user.id != widget.currentUserId &&
-                user.fullName.toLowerCase().contains(query.toLowerCase()),
-          )
-          .toList();
-    });
+    context.read<ChatBloc>().add(FilterUsers(query, widget.currentUserId));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS) {
-      return CupertinoAlertDialog(
-        title: const Text('Start New Chat'),
-        content: Column(
-          children: [
-            CupertinoTextField(
-              controller: _searchController,
-              onChanged: _filterUsers,
-              placeholder: 'Search users...',
-              prefix: const Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Icon(CupertinoIcons.search),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                itemCount: _filteredUsers.length,
-                itemBuilder: (context, index) {
-                  final user = _filteredUsers[index];
-                  return CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => widget.onUserSelected(user),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: user.avatarUrl != null
-                              ? NetworkImage(user.avatarUrl!)
-                              : null,
-                          child: user.avatarUrl == null
-                              ? Text(user.firstName[0].toUpperCase())
-                              : null,
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocBuilder<ChatBloc, ChatState>(
+      builder: (context, state) {
+        List<ChatUser> filteredUsers = [];
+        if (state is ChatLoaded) {
+          filteredUsers = state.filteredUsers;
+        }
+        if (Platform.isIOS) {
+          return CupertinoAlertDialog(
+            title: const Text('Start New Chat'),
+            content: Column(
+              children: [
+                CupertinoTextField(
+                  controller: _searchController,
+                  onChanged: _filterUsers,
+                  placeholder: 'Search users...',
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(left: 8.0),
+                    child: Icon(CupertinoIcons.search),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    itemCount: filteredUsers.length,
+                    itemBuilder: (context, index) {
+                      final user = filteredUsers[index];
+                      return CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () => widget.onUserSelected(user),
+                        child: Row(
                           children: [
-                            Text(user.fullName),
-                            Text(
-                              user.email,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: CupertinoColors.systemGrey,
-                              ),
+                            CircleAvatar(
+                              backgroundImage: user.avatarUrl != null
+                                  ? NetworkImage(user.avatarUrl!)
+                                  : null,
+                              child: user.avatarUrl == null
+                                  ? Text(user.firstName[0].toUpperCase())
+                                  : null,
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(user.fullName),
+                                Text(
+                                  user.email,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: CupertinoColors.systemGrey,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          CupertinoDialogAction(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
-      );
-    } else {
-      return AlertDialog(
-        title: const Text('Start New Chat'),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 300,
-          child: Column(
-            children: [
-              TextField(
-                controller: _searchController,
-                onChanged: _filterUsers,
-                decoration: const InputDecoration(
-                  hintText: 'Search users...',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _filteredUsers.length,
-                  itemBuilder: (context, index) {
-                    final user = _filteredUsers[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: user.avatarUrl != null
-                            ? NetworkImage(user.avatarUrl!)
-                            : null,
-                        child: user.avatarUrl == null
-                            ? Text(user.firstName[0].toUpperCase())
-                            : null,
-                      ),
-                      title: Text(user.fullName),
-                      subtitle: Text(user.email),
-                      onTap: () => widget.onUserSelected(user),
-                    );
-                  },
-                ),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
               ),
             ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
-      );
-    }
+          );
+        } else {
+          return AlertDialog(
+            title: const Text('Start New Chat'),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 300,
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _searchController,
+                    onChanged: _filterUsers,
+                    decoration: const InputDecoration(
+                      hintText: 'Search users...',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredUsers.length,
+                      itemBuilder: (context, index) {
+                        final user = filteredUsers[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: user.avatarUrl != null
+                                ? NetworkImage(user.avatarUrl!)
+                                : null,
+                            child: user.avatarUrl == null
+                                ? Text(user.firstName[0].toUpperCase())
+                                : null,
+                          ),
+                          title: Text(user.fullName),
+                          subtitle: Text(user.email),
+                          onTap: () => widget.onUserSelected(user),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        }
+      },
+    );
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-}
-
-class ConversationScreen extends StatelessWidget {
-  final ChatConversation conversation;
-  final ChatUser otherUser;
-  final String currentUserId;
-  final ChatService chatService;
-
-  const ConversationScreen({
-    super.key,
-    required this.conversation,
-    required this.otherUser,
-    required this.currentUserId,
-    required this.chatService,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          ConversationBloc(chatService: chatService)
-            ..add(LoadMessages(conversation.id)),
-      child: _ConversationScreenView(
-        conversation: conversation,
-        otherUser: otherUser,
-        currentUserId: currentUserId,
-      ),
-    );
-  }
-}
-
-class _ConversationScreenView extends StatefulWidget {
-  final ChatConversation conversation;
-  final ChatUser otherUser;
-  final String currentUserId;
-
-  const _ConversationScreenView({
-    required this.conversation,
-    required this.otherUser,
-    required this.currentUserId,
-  });
-
-  @override
-  State<_ConversationScreenView> createState() =>
-      _ConversationScreenViewState();
-}
-
-class _ConversationScreenViewState extends State<_ConversationScreenView> {
-  final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _sendMessage() {
-    final content = _messageController.text.trim();
-    if (content.isEmpty) return;
-    context.read<ConversationBloc>().add(
-      SendMessageEvent(
-        conversationId: widget.conversation.id,
-        senderId: widget.currentUserId,
-        content: content,
-      ),
-    );
-    _messageController.clear();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: widget.otherUser.avatarUrl != null
-                  ? NetworkImage(widget.otherUser.avatarUrl!)
-                  : null,
-              child: widget.otherUser.avatarUrl == null
-                  ? Text(widget.otherUser.firstName[0].toUpperCase())
-                  : null,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.otherUser.fullName),
-                  Text(
-                    'Online',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.customSuccess,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: BlocBuilder<ConversationBloc, ConversationState>(
-              builder: (context, state) {
-                if (state is ConversationLoading ||
-                    state is ConversationInitial) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is ConversationLoaded) {
-                  WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => _scrollToBottom(),
-                  );
-                  final messages = state.messages;
-                  return ListView.builder(
-                    controller: _scrollController,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      final isMe = message.senderId == widget.currentUserId;
-                      return _MessageBubble(message: message, isMe: isMe);
-                    },
-                  );
-                } else if (state is ConversationError) {
-                  return Center(child: Text('Error: ${state.message}'));
-                } else {
-                  return const SizedBox.shrink();
-                }
-              },
-            ),
-          ),
-          _buildMessageInput(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessageInput() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              decoration: InputDecoration(
-                hintText: 'Type a message...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-              onSubmitted: (_) => _sendMessage(),
-            ),
-          ),
-          const SizedBox(width: 8),
-          FloatingActionButton(
-            onPressed: _sendMessage,
-            backgroundColor: AppTheme.customAccent,
-            child: Icon(
-              Platform.isIOS ? CupertinoIcons.arrow_up : Icons.send,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MessageBubble extends StatelessWidget {
-  final ChatMessage message;
-  final bool isMe;
-
-  const _MessageBubble({required this.message, required this.isMe});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isMe ? AppTheme.customAccent : Colors.grey[300],
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              message.content,
-              style: TextStyle(
-                color: isMe ? Colors.white : Colors.black,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${message.createdAt.hour}:${message.createdAt.minute.toString().padLeft(2, '0')}',
-                  style: TextStyle(
-                    color: isMe ? Colors.white70 : Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-                if (isMe) ...[
-                  const SizedBox(width: 4),
-                  Icon(
-                    message.isRead ? Icons.done_all : Icons.done,
-                    size: 16,
-                    color: message.isRead ? Colors.white : Colors.white70,
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

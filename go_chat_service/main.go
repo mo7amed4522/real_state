@@ -21,6 +21,7 @@ func main() {
 
 	// Initialize database
 	database.InitDB()
+	database.InitRedis()
 
 	// Initialize services
 	chatService := services.NewChatService()
@@ -31,7 +32,7 @@ func main() {
 	userHandler := handlers.NewUserHandler(userService)
 
 	// Initialize WebSocket hub
-	hub := websocket.NewHub()
+	hub := websocket.NewHub(chatService)
 	go hub.Run()
 
 	// Setup routes

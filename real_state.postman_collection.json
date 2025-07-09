@@ -968,7 +968,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"chat_room\": \"{{room_id}}\",\n  \"content\": \"Hello, this is a message!\"\n}"
+							"raw": "{\n  \"conversationId\": \"{{conversation_id}}\",\n  \"senderId\": \"{{sender_id}}\",\n  \"content\": \"Hello!\",\n  \"messageType\": \"text\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/chat/messages/send/",
@@ -1251,6 +1251,21 @@
 						{"key": "user_id", "value": "{{user_id}}"}
 					]
 				}
+			}
+		},
+		{
+			"name": "Download File from Redis",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/v1/chat/conversations/{{conversation_id}}/files/{{filename}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8081",
+					"path": ["api", "v1", "chat", "conversations", "{{conversation_id}}", "files", "{{filename}}"]
+				},
+				"description": "Download a file (image, audio, etc.) stored as a binary blob in Redis for a conversation. Replace {{conversation_id}} and {{filename}} with actual values."
 			}
 		}
 	],

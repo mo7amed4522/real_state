@@ -1,7 +1,11 @@
 package services
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
+	"log"
+	"time"
 
 	"go-chat-service/database"
 	"go-chat-service/models"
@@ -52,10 +56,11 @@ func (s *ChatService) GetOrCreateConversation(user1ID, user2ID uuid.UUID) (*mode
 
 // SendMessage sends a message in a conversation
 func (s *ChatService) SendMessage(conversationID, senderID uuid.UUID, content string, messageType models.MessageType) (*models.Message, error) {
+	// If messageType is file/image/voice, content should be a URL
 	message := models.Message{
 		ConversationID: conversationID,
 		SenderID:       senderID,
-		Content:        content,
+		Content:        content, // URL or text
 		MessageType:    messageType,
 	}
 
@@ -72,7 +77,28 @@ func (s *ChatService) SendMessage(conversationID, senderID uuid.UUID, content st
 
 	// Load sender information
 	err = database.DB.Preload("Sender").First(&message, message.ID).Error
-	return &message, err
+	if err != nil {
+		return nil, err
+	}
+
+	// Save to Redis (append to chat:messages:<conversationId> list)
+	redisKey := "chat:messages:" + conversationID.String()
+	msgJson, err := json.Marshal(message)
+	if err == nil {
+		err = database.RedisClient.RPush(context.Background(), redisKey, msgJson).Err()
+		if err != nil {
+			log.Printf("error saving chat message to Redis: %v", err)
+		}
+		// Set expiration (TTL) to 30 days on the key
+		expireErr := database.RedisClient.Expire(context.Background(), redisKey, 30*24*time.Hour).Err()
+		if expireErr != nil {
+			log.Printf("error setting expiration on chat message key in Redis: %v", expireErr)
+		}
+	} else {
+		log.Printf("error marshaling chat message for Redis: %v", err)
+	}
+
+	return &message, nil
 }
 
 // GetConversationMessages gets all messages in a conversation
@@ -144,4 +170,55 @@ func (s *ChatService) GetUnreadMessageCount(userID uuid.UUID) (int64, error) {
 		Count(&count).Error
 
 	return count, err
+}
+
+// GetConversationMessagesFromRedis tries to get messages from Redis, falls back to DB if not found
+func (s *ChatService) GetConversationMessagesFromRedis(conversationID uuid.UUID, limit, offset int) ([]models.Message, error) {
+	ctx := context.Background()
+	redisKey := "chat:messages:" + conversationID.String()
+
+	// Get all messages from Redis (or use limit/offset as needed)
+	msgs, err := database.RedisClient.LRange(ctx, redisKey, int64(offset), int64(offset+limit-1)).Result()
+	if err != nil {
+		return nil, err
+	}
+	if len(msgs) == 0 {
+		// Fallback to DB
+		return s.GetConversationMessages(conversationID, limit, offset)
+	}
+
+	var messages []models.Message
+	for _, msgStr := range msgs {
+		var msg models.Message
+		if err := json.Unmarshal([]byte(msgStr), &msg); err == nil {
+			messages = append(messages, msg)
+		}
+	}
+	return messages, nil
+}
+
+// GetMessageCountFromRedis returns the number of messages in a conversation from Redis
+func (s *ChatService) GetMessageCountFromRedis(conversationID uuid.UUID) (int64, error) {
+	ctx := context.Background()
+	redisKey := "chat:messages:" + conversationID.String()
+	return database.RedisClient.LLen(ctx, redisKey).Result()
+}
+
+// GetMessageCountFromDB returns the number of messages in a conversation from the database
+func (s *ChatService) GetMessageCountFromDB(conversationID uuid.UUID) (int64, error) {
+	var count int64
+	err := database.DB.Model(&models.Message{}).Where("conversation_id = ?", conversationID).Count(&count).Error
+	return count, err
+}
+
+// GetFileBlobFromRedis retrieves a file's binary data from Redis by key
+func GetFileBlobFromRedis(key string) ([]byte, error) {
+	ctx := context.Background()
+	return database.RedisClient.Get(ctx, key).Bytes()
+}
+
+// StoreFileBlobInRedis stores a file's binary data in Redis under the given key
+func StoreFileBlobInRedis(key string, data []byte) error {
+	ctx := context.Background()
+	return database.RedisClient.Set(ctx, key, data, 0).Err()
 }

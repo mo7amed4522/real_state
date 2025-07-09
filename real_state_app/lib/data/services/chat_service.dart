@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/chat_models.dart';
 
@@ -141,6 +142,23 @@ class ChatService {
     }
   }
 
+  // Save message to Postgres via HTTP API
+  Future<void> saveMessageToDatabase(ChatMessage message) async {
+    try {
+      final request = await HttpClient().postUrl(
+        Uri.parse(dotenv.env['HTTP_SEND_MESSAGE']!),
+      );
+      request.headers.set('Content-Type', 'application/json');
+      request.write(jsonEncode(message.toJson()));
+      final httpResponse = await request.close();
+      if (httpResponse.statusCode != 201 && httpResponse.statusCode != 200) {
+        debugPrint('Failed to save message to DB: ${httpResponse.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error saving message to DB: $e');
+    }
+  }
+
   // API Methods
   Future<List<ChatConversation>> getUserConversations(String userId) async {
     try {
@@ -151,10 +169,8 @@ class ChatService {
       final responseBody = await httpResponse.transform(utf8.decoder).join();
 
       if (httpResponse.statusCode == 200) {
-        final data = jsonDecode(responseBody);
-        return (data['conversations'] as List)
-            .map((conv) => ChatConversation.fromJson(conv))
-            .toList();
+        // Offload parsing to a background isolate
+        return await compute(_parseConversations, responseBody);
       } else {
         throw Exception(
           'Failed to load conversations: ${httpResponse.statusCode}',
@@ -166,6 +182,13 @@ class ChatService {
     }
   }
 
+  static List<ChatConversation> _parseConversations(String responseBody) {
+    final data = jsonDecode(responseBody);
+    return (data['conversations'] as List)
+        .map((conv) => ChatConversation.fromJson(conv))
+        .toList();
+  }
+
   Future<List<ChatUser>> getAllUsers() async {
     try {
       final response = await HttpClient().getUrl(Uri.parse('$_baseUrl/users/'));
@@ -173,10 +196,8 @@ class ChatService {
       final responseBody = await httpResponse.transform(utf8.decoder).join();
 
       if (httpResponse.statusCode == 200) {
-        final data = jsonDecode(responseBody);
-        return (data['users'] as List)
-            .map((user) => ChatUser.fromJson(user))
-            .toList();
+        // Offload parsing to a background isolate
+        return await compute(_parseUsers, responseBody);
       } else {
         throw Exception('Failed to load users: ${httpResponse.statusCode}');
       }
@@ -184,6 +205,13 @@ class ChatService {
       debugPrint('Error loading users: $e');
       return [];
     }
+  }
+
+  static List<ChatUser> _parseUsers(String responseBody) {
+    final data = jsonDecode(responseBody);
+    return (data['users'] as List)
+        .map((user) => ChatUser.fromJson(user))
+        .toList();
   }
 
   Future<ChatConversation?> createConversation(
@@ -220,7 +248,7 @@ class ChatService {
     }
   }
 
-  Future<List<ChatMessage>> getConversationMessages(
+  Future<PaginatedMessages> getConversationMessages(
     String conversationId, {
     int limit = 50,
     int offset = 0,
@@ -235,16 +263,56 @@ class ChatService {
 
       if (httpResponse.statusCode == 200) {
         final data = jsonDecode(responseBody);
-        return (data['messages'] as List)
+        final messages = (data['messages'] as List)
             .map((msg) => ChatMessage.fromJson(msg))
             .toList();
+        final hasMore = data['hasMore'] == true;
+        return PaginatedMessages(messages: messages, hasMore: hasMore);
       } else {
         throw Exception('Failed to load messages: ${httpResponse.statusCode}');
       }
     } catch (e) {
       debugPrint('Error loading messages: $e');
-      return [];
+      return PaginatedMessages(messages: [], hasMore: false);
     }
+  }
+
+  /// Download a file (image/audio) from Redis by conversationId and filename
+  Future<Uint8List?> downloadFileFromRedis(
+    String conversationId,
+    String filename,
+  ) async {
+    try {
+      final url =
+          '$_baseUrl/chat/conversations/$conversationId/files/$filename';
+      final request = await HttpClient().getUrl(Uri.parse(url));
+      final response = await request.close();
+      if (response.statusCode == 200) {
+        final bytes = await consolidateHttpClientResponseBytes(response);
+        // If you need to process the bytes (e.g., decompress), use compute here
+        // return await compute(_processDownloadedBytes, bytes);
+        return bytes;
+      } else {
+        debugPrint('Failed to download file: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error downloading file: $e');
+      return null;
+    }
+  }
+
+  static Future<Uint8List> consolidateHttpClientResponseBytes(
+      HttpClientResponse response) async {
+    final completer = Completer<Uint8List>();
+    final contents = <int>[];
+    response.listen(
+      (data) => contents.addAll(data),
+      onDone: () => completer.complete(Uint8List.fromList(contents)),
+      onError: (e) => completer.completeError(e),
+      cancelOnError: true,
+    );
+    return completer.future;
   }
 
   // Dispose resources
@@ -254,4 +322,10 @@ class ChatService {
     _onlineStatusController?.close();
     _conversationsController?.close();
   }
+}
+
+class PaginatedMessages {
+  final List<ChatMessage> messages;
+  final bool hasMore;
+  PaginatedMessages({required this.messages, required this.hasMore});
 }

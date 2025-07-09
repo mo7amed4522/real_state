@@ -11,6 +11,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'presentation/bloc/animated_text_form_field_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +33,19 @@ void main() async {
     await Hive.initFlutter();
     await _handleLocationPermission();
     await dotenv.load(fileName: ".env");
-    runApp(ProviderScope(child: RealStateApp()));
+    runApp(
+      ProviderScope(
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AnimatedTextFormFieldBloc>(
+              create: (_) => AnimatedTextFormFieldBloc(),
+            ),
+            // Add other BlocProviders here as needed
+          ],
+          child: RealStateApp(),
+        ),
+      ),
+    );
   } catch (e, stack) {
     runApp(
       MaterialApp(

@@ -1,0 +1,45 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter with FVM
+        uses: kuhnroyal/flutter-fvm-action@v2
+        with:
+          flutter-version: "stable"
+          fvm: true
+
+      - name: Install dependencies
+        run: |
+          cd real_state_app
+          fvm flutter pub get
+
+      - name: Run analyzer
+        run: |
+          cd real_state_app
+          fvm flutter analyze
+
+      - name: Run tests
+        run: |
+          cd real_state_app
+          fvm flutter test 
+
+      - name: Run integration performance test
+        run: |
+          cd real_state_app
+          fvm flutter test integration_test/perf_home_screen_test.dart --dart-define=PERF=true 
+
+      - name: Run login and register integration test
+        run: |
+          cd real_state_app
+          fvm flutter test integration_test/login_and_register_test.dart 

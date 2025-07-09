@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:real_state_app/core/constant/constatnt.dart';
 import 'package:real_state_app/data/datasources/local_storage.dart';
+import 'package:real_state_app/presentation/views/conversation_screen.dart';
 import 'package:real_state_app/presentation/views/register_view.dart';
 import 'package:real_state_app/presentation/views/screens/chat_screen.dart';
 import 'package:real_state_app/presentation/views/settings/edit_screen.dart';
